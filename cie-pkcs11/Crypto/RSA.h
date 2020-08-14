@@ -15,6 +15,7 @@ class CRSA
 	BCRYPT_KEY_HANDLE key;
     void GenerateKey(DWORD size, ByteDynArray &module, ByteDynArray &pubexp, ByteDynArray &privexp);
 #else
+
 	//RSA* keyPriv;
     CryptoPP::RSA::PublicKey pubKey;
     DWORD GenerateKey(DWORD size, ByteDynArray &module, ByteDynArray &pubexp, ByteDynArray &privexp);
