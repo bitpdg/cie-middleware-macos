@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		461398B8C02047C25F03D065 /* Pods_CIE_ID.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC86202F63F36F82504EC0B3 /* Pods_CIE_ID.framework */; };
 		5CA6E27FF73910B2FFB64484 /* libPods-cie-pkcs11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A3612AA9E73AB30473645 /* libPods-cie-pkcs11.a */; };
+		7663CDD92518DF6A00FDC547 /* CieList.m in Sources */ = {isa = PBXBuildFile; fileRef = 7663CDD82518DF6A00FDC547 /* CieList.m */; };
+		7663CDDC2518F09E00FDC547 /* Cie.m in Sources */ = {isa = PBXBuildFile; fileRef = 7663CDDB2518F09E00FDC547 /* Cie.m */; };
 		E504202C2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
 		E504202D2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
 		E504202E2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
@@ -213,6 +215,10 @@
 		2F05ABF04FC862DB88E240A2 /* Pods-CIE ID.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CIE ID.release.xcconfig"; path = "Pods/Target Support Files/Pods-CIE ID/Pods-CIE ID.release.xcconfig"; sourceTree = "<group>"; };
 		438D493AABE95B9738D331F7 /* Pods-cie-pkcs11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cie-pkcs11.release.xcconfig"; path = "Pods/Target Support Files/Pods-cie-pkcs11/Pods-cie-pkcs11.release.xcconfig"; sourceTree = "<group>"; };
 		6E9C0B9FE6F0B903268DC6D0 /* Pods-CIE ID.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CIE ID.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CIE ID/Pods-CIE ID.debug.xcconfig"; sourceTree = "<group>"; };
+		7663CDD72518DF6A00FDC547 /* CieList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CieList.h; sourceTree = "<group>"; };
+		7663CDD82518DF6A00FDC547 /* CieList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CieList.m; sourceTree = "<group>"; };
+		7663CDDA2518F07900FDC547 /* Cie.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Cie.h; sourceTree = "<group>"; };
+		7663CDDB2518F09E00FDC547 /* Cie.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Cie.m; sourceTree = "<group>"; };
 		79847492CAD3310437BDE674 /* Pods-cie-pkcs11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cie-pkcs11.debug.xcconfig"; path = "Pods/Target Support Files/Pods-cie-pkcs11/Pods-cie-pkcs11.debug.xcconfig"; sourceTree = "<group>"; };
 		DC86202F63F36F82504EC0B3 /* Pods_CIE_ID.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CIE_ID.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CIE-LOGO-REGISTRATO.png"; sourceTree = "<group>"; };
@@ -525,6 +531,8 @@
 		E544F56421BFAFC60038B2CA /* CIE ID */ = {
 			isa = PBXGroup;
 			children = (
+				7663CDD72518DF6A00FDC547 /* CieList.h */,
+				7663CDD82518DF6A00FDC547 /* CieList.m */,
 				E544F56521BFAFC60038B2CA /* AppDelegate.h */,
 				E544F56621BFAFC60038B2CA /* AppDelegate.m */,
 				E544F56B21BFAFC90038B2CA /* Assets.xcassets */,
@@ -538,6 +546,8 @@
 				E59DCCDE21C3BB7300CE4790 /* IntroViewController.m */,
 				E5A6019422CA91CD0003B79E /* PINNoticeViewController.h */,
 				E5A6019522CA91CD0003B79E /* PINNoticeViewController.m */,
+				7663CDDA2518F07900FDC547 /* Cie.h */,
+				7663CDDB2518F09E00FDC547 /* Cie.m */,
 			);
 			path = "CIE ID";
 			sourceTree = "<group>";
@@ -1216,9 +1226,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E544F57221BFAFC90038B2CA /* main.m in Sources */,
+				7663CDD92518DF6A00FDC547 /* CieList.m in Sources */,
 				E5A6019622CA91CD0003B79E /* PINNoticeViewController.m in Sources */,
 				E544F56721BFAFC60038B2CA /* AppDelegate.m in Sources */,
 				E544F57921BFB06A0038B2CA /* MainViewController.mm in Sources */,
+				7663CDDC2518F09E00FDC547 /* Cie.m in Sources */,
 				E59DCCDF21C3BB7300CE4790 /* IntroViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

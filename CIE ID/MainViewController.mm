@@ -11,6 +11,8 @@
 // directive for PKCS#11
 #include "../cie-pkcs11/PKCS11/cryptoki.h"
 #import "PINNoticeViewController.h"
+#import "CieList.h"
+#import "Cie.h"
 
 #include <memory.h>
 #include <time.h>
@@ -19,6 +21,7 @@
 
 #include "../cie-pkcs11/CSP/AbilitaCIE.h"
 #include "../cie-pkcs11/CSP/PINManager.h"
+
 
 using namespace std;
 
@@ -41,13 +44,15 @@ string sPAN;
 string sName;
 string sEfSeriale;
 
+CieList *cieList;
+
 void* hModule;
 
 - (void) viewDidLoad
 {
     [super viewDidLoad];
     
-    const char* szCryptoki = "libcie-pkcs11.dylib";
+    const char* szCryptoki = "/Users/piero/Library/Developer/Xcode/DerivedData/cie-pkcs11-fjkzxzwrcrivujcoivwzmdntbtzt/Build/Products/Debug/libcie-pkcs11.dylib";
     
     hModule = dlopen(szCryptoki, RTLD_LAZY);
     if(!hModule)
@@ -238,6 +243,30 @@ CK_RV completedCallback(string& PAN,
     [self askRemove:@"Vuoi rimuovere la CIE attualmente abbinata?" withTitle:@"Rimozione CIE"];
 }
 
+- (IBAction)onAggiungiCie:(id)sender {
+    
+    self.homeFirstPageView.hidden = NO;
+    self.homeSecondPageView.hidden = YES;
+    self.homeThirdPageView.hidden = YES;
+    self.homeFourthPageView.hidden = YES;
+    self.cambioPINPageView.hidden = YES;
+    self.cambioPINOKPageView.hidden = YES;
+    self.sbloccoPageView.hidden = YES;
+    self.sbloccoOKPageView.hidden = YES;
+    self.helpPageView.hidden = YES;
+    self.infoPageView.hidden = YES;
+    
+    for(int i = 1; i < 9; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    NSTextField* txtField = [self.view viewWithTag:1];
+    [txtField selectText:nil];
+}
+
 - (void) disabilita
 {
     NSString* pan = [NSUserDefaults.standardUserDefaults objectForKey:@"serialnumber"];
@@ -284,9 +313,14 @@ CK_RV completedCallback(string& PAN,
     
     switch (rv) {
         case CKR_OK:
+        {
             [self showMessage:@"CIE disabilitata con successo" withTitle:@"CIE disabilitata" exitAfter:NO];
+            
             self.labelSerialNumber.stringValue = @"";
             self.labelCardHolder.stringValue = @"";
+            
+            NSString* pan = [NSUserDefaults.standardUserDefaults objectForKey:@"serialnumber"];
+            [cieList removeCie:pan];
             
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"serialnumber"];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"cardholder"];
@@ -294,11 +328,12 @@ CK_RV completedCallback(string& PAN,
             if( [NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"])
                 [NSUserDefaults.standardUserDefaults removeObjectForKey:@"efSeriale"];
             
+            [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
             [NSUserDefaults.standardUserDefaults synchronize];
-            
+                        
             [self showHomeFirstPage];
             break;
-            
+        }
         case CKR_TOKEN_NOT_PRESENT:
             [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
             break;
@@ -370,11 +405,39 @@ CK_RV completedCallback(string& PAN,
         [self showMessage: @"Il PIN deve essere composto da 8 numeri" withTitle:@"PIN non corretto" exitAfter:false];
         return;
     }
+
+    //TODO: aggiungere verifica isCieEnrolled
     
+    
+       isCIEEnrolledfn pfnisCieEnrolled = (isCIEEnrolledfn)dlsym(hModule, "isCIEEnrolled");
+
+       if(!pfnisCieEnrolled)
+       {
+           dlclose(hModule);
+           [self showMessage: @"Funzione isCieEnrolled non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
+           
+           return;
+       }
+    
+        char serial_number[32]={0};
+        
+        [self showHomeSecondPage];
+        
+        pfnisCieEnrolled(serial_number, &progressCallback);
+        
+        NSDictionary *cieDict = [cieList getDictionary];
+        
+        if(cieDict[[NSString stringWithUTF8String:serial_number]])
+        {
+            [self showMessage: @"CIE già abilitata" withTitle:@"CIE già abilitata" exitAfter:NO];
+            [self showHomeFirstPage];
+            return;
+        }
+  
     [((NSControl*)sender) setEnabled:NO];
     
     dispatch_async(dispatch_get_global_queue(0,0), ^{
-        
+
         AbilitaCIEfn pfnAbilitaCIE = (AbilitaCIEfn)dlsym(hModule, "AbilitaCIE");
         if(!pfnAbilitaCIE)
         {
@@ -395,8 +458,6 @@ CK_RV completedCallback(string& PAN,
         }
         
         int attempts = -1;
-        
-        [self showHomeSecondPage];
         
         long ret = pfnAbilitaCIE(szPAN, [pin cStringUsingEncoding:NSUTF8StringEncoding], &attempts, &progressCallback, &completedCallback);
         
@@ -443,17 +504,22 @@ CK_RV completedCallback(string& PAN,
                     self.labelSerialNumber.stringValue = [NSString stringWithUTF8String:sEfSeriale.c_str()];
                     self.labelCardHolder.stringValue = [NSString stringWithUTF8String:sName.c_str()];
                     
-                    NSString *PAN =
-                    [[NSString alloc] initWithCString:sPAN.c_str()
-                                      encoding:NSMacOSRomanStringEncoding];
+                    NSString *PAN = [[NSString alloc] initWithCString:sPAN.c_str() encoding:NSMacOSRomanStringEncoding];
                     
-                    //[NSUserDefaults.standardUserDefaults setObject:PAN forKey:@"PAN"];
+                    NSString *serialNumber = [[NSString alloc] initWithCString:sEfSeriale.c_str() encoding:NSMacOSRomanStringEncoding];
+                    
+                    NSString *name = [[NSString alloc] initWithCString:sName.c_str() encoding:NSMacOSRomanStringEncoding];
                     
                     [NSUserDefaults.standardUserDefaults setObject:self.labelSerialNumber.stringValue forKey:@"efSeriale"];
                     [NSUserDefaults.standardUserDefaults setObject:PAN forKey:@"serialnumber"];
                     [NSUserDefaults.standardUserDefaults setObject:self.labelCardHolder.stringValue forKey:@"cardholder"];
                     [NSUserDefaults.standardUserDefaults synchronize];
                     
+                    Cie *cie = [[Cie alloc] init:name serial:serialNumber];
+                    [cieList addCie:PAN owner:cie];
+                    
+                    [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
+                    [NSUserDefaults.standardUserDefaults synchronize];
                     
                     [self showHomeThirdPage];
                     
@@ -863,6 +929,8 @@ CK_RV completedCallback(string& PAN,
 
 - (void) showHomeFirstPage
 {
+    //[NSUserDefaults.standardUserDefaults removeObjectForKey:@"cieDictionary"];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
@@ -871,6 +939,20 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        
+        if((![NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
+        {
+            cieList = [CieList new];
+        }else
+        {
+            NSData *cieData = [NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"];
+            
+            cieList = [[CieList alloc] init:cieData];
+            NSDictionary *cieDict = [cieList getDictionary];
+            
+            NSLog(@"Dizionario %@", cieDict);
+            
+        }
         
         if((![NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"]) and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
         {
@@ -892,7 +974,6 @@ CK_RV completedCallback(string& PAN,
         }
         else
         {
-            
             self.labelSerialNumber.stringValue = @"";
             self.labelCardHolder.stringValue = @"";
             
@@ -918,9 +999,7 @@ CK_RV completedCallback(string& PAN,
             
             NSTextField* txtField = [self.view viewWithTag:1];
             [txtField selectText:nil];
-             
         }
-        //    }
     });
 }
 
@@ -972,6 +1051,8 @@ CK_RV completedCallback(string& PAN,
 
 - (void) showHomeFourthPage
 {
+    
+    NSLog(@"CIAO");
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;

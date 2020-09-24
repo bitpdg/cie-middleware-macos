@@ -32,5 +32,6 @@ typedef CK_RV (*AbilitaCIEfn)(const char*  szPAN,
 
 typedef CK_RV (*VerificaCIEAbilitatafn)(const char*  szPAN);
 typedef CK_RV (*DisabilitaCIEfn)(const char*  szPAN);
+typedef CK_RV (*isCIEEnrolledfn)(char* seriale, PROGRESS_CALLBACK progressCallBack);
 
 
