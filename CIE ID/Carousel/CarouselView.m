@@ -70,11 +70,22 @@
 
 - (void) configureWithCards:(NSArray <Cie *> * _Nonnull)cardList {
 
-    NSAssert([cardList count] >= 1, @"Carousel cards must be at least 1");
-
     __weak __typeof__(self) weakSelf = self;
     
-    if ([cardList count] > 1) {
+    if ([cardList count] == 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong __typeof__(weakSelf) strongSelf = weakSelf;
+            [strongSelf.singleCardContainerView setHidden:YES];
+            [strongSelf.multipleCardContainerView setHidden:YES];
+            [strongSelf.backButton setHidden:YES];
+            [strongSelf.nextButton setHidden:YES];
+            [strongSelf.rightCard setHidden:YES];
+            [strongSelf.leftCard setHidden:YES];
+            [strongSelf.backButton setHidden:YES];
+            [strongSelf.nextButton setHidden:YES];
+        });
+    }
+    else if ([cardList count] > 1) {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong __typeof__(weakSelf) strongSelf = weakSelf;
             [strongSelf.singleCardContainerView setHidden:YES];
@@ -103,7 +114,9 @@
     
     cards = cardList;
     
-    [self updateCards];
+    if ([cardList count] > 0) {
+        [self updateCards];
+    }
 
 }
 
@@ -115,15 +128,8 @@
 
 - (IBAction)removeCardPressed:(id)sender {
     if (self.delegate){
-        
-        if ([cards count] == 1) {
-            if ([self.delegate respondsToSelector:@selector(shouldRemoveAllCards)]){
-                [self.delegate shouldRemoveAllCards];
-            }
-        }
-        else if ([self.delegate respondsToSelector:@selector(shouldRemoveCard:)]){
-            NSArray <Cie *> *newCards = [self.delegate shouldRemoveCard:[_mainCard getCard]];
-            [self configureWithCards:newCards];
+        if ([self.delegate respondsToSelector:@selector(shouldRemoveCard:)]){
+            [self.delegate shouldRemoveCard:[_mainCard getCard]];
         }
     }
     
@@ -171,6 +177,10 @@
 #pragma mark - Private methods
 
 - (void) updateCards {
+    if ([cards count] == 0) {
+        return;
+    }
+    
     NSInteger rightIndex = index + 1;
     
     if (rightIndex > ([cards count] - 1)) {

@@ -13,10 +13,11 @@
 
 @interface Cie : NSObject <NSCoding>
 
--(id)init: (NSString*) name serial:(NSString*) serialNumner;
+-(id)init: (NSString*) name serial:(NSString*) serialNumner pan:(NSString *) pan;
 
 -(NSString*) getName;
--(NSString*) getSerialNumner;
+-(NSString*) getSerialNumber;
+-(NSString*) getPan;
 
 @end
 

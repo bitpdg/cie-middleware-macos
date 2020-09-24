@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
+#import "CarouselView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,9 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSTextField* textFieldNewPINSblocco;
 @property IBOutlet NSTextField* textFieldConfirmPINSbloco;
 
-@property IBOutlet NSTextField* labelSerialNumber;
-@property IBOutlet NSTextField* labelCardHolder;
-
 @property IBOutlet NSView* homeButtonView;
 @property IBOutlet NSView* cambioPINButtonView;
 @property IBOutlet NSView* sbloccoPINButtonView;
@@ -57,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* helpButtonView;
 @property IBOutlet NSView* infoButtonView;
 
+@property (weak) IBOutlet CarouselView *carouselView;
 
 @end
 

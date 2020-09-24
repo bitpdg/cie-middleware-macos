@@ -12,15 +12,17 @@
 
 @property (strong, nonatomic) NSString* name;
 @property (strong, nonatomic) NSString* serialNumber;
+@property (strong, nonatomic) NSString* pan;
 
 @end
 
 @implementation Cie
 
--(id)init: (NSString*) name serial:(NSString*) serialNumner
+-(id)init: (NSString*) name serial:(NSString*) serialNumner pan:(NSString *) pan
 {
     self.serialNumber = serialNumner;
     self.name = name;
+    self.pan = pan;
     
     return self;
 }
@@ -29,19 +31,26 @@
 {
     return self.name;
 }
--(NSString*) getSerialNumner
+-(NSString*) getSerialNumber
 {
     return self.serialNumber;
+}
+
+-(NSString*) getPan
+{
+    return self.pan;
 }
 
 - (void)encodeWithCoder:(nonnull NSCoder *)coder {
     [coder encodeObject:self.name forKey:@"name"];
     [coder encodeObject:self.serialNumber forKey:@"serialNumber"];
+    [coder encodeObject:self.pan forKey:@"pan"];
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     self.name = [coder decodeObjectForKey:@"name"];
     self.serialNumber = [coder decodeObjectForKey:@"serialNumber"];
+    self.pan = [coder decodeObjectForKey:@"pan"];
     return self;
 }
 

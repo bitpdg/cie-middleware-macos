@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CarouselViewDelegate <NSObject>
 
 - (void) shouldAddCard;
-- (NSArray <Cie *> * _Nonnull) shouldRemoveCard:(Cie *)card;
+- (void) shouldRemoveCard:(Cie *)card;
 - (void) shouldRemoveAllCards;
 
 @end

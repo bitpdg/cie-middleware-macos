@@ -28,6 +28,11 @@ using namespace std;
 typedef CK_RV (*C_GETFUNCTIONLIST)(CK_FUNCTION_LIST_PTR_PTR ppFunctionList);
 CK_FUNCTION_LIST_PTR g_pFuncList;
 
+@interface MainViewController() <CarouselViewDelegate> {
+    Cie *removingCie;
+}
+
+@end
 
 @implementation MainViewController
 
@@ -71,6 +76,8 @@ void* hModule;
     
     labelProgressPointerSbloccoPIN = _labelProgressSbloccoPIN;
     progressIndicatorPointerSbloccoPIN = _progressIndicatorSbloccoPIN;
+    
+    self.carouselView.delegate = self;
 }
 
 - (void) viewDidAppear
@@ -238,11 +245,6 @@ CK_RV completedCallback(string& PAN,
     return false;
 }
 
-- (IBAction)onDisabilita:(id)sender
-{
-    [self askRemove:@"Vuoi rimuovere la CIE attualmente abbinata?" withTitle:@"Rimozione CIE"];
-}
-
 - (IBAction)onAggiungiCie:(id)sender {
     
     self.homeFirstPageView.hidden = NO;
@@ -269,7 +271,9 @@ CK_RV completedCallback(string& PAN,
 
 - (void) disabilita
 {
-    NSString* pan = [NSUserDefaults.standardUserDefaults objectForKey:@"serialnumber"];
+
+    NSString* pan = [removingCie getPan];
+    removingCie = nil;
     
     // check se abilitata ossia se cache presente
     VerificaCIEAbilitatafn pfnVerificaCIE = (VerificaCIEAbilitatafn)dlsym(hModule, "VerificaCIEAbilitata");
@@ -284,9 +288,12 @@ CK_RV completedCallback(string& PAN,
     
     switch (rv) {
         case CKR_OK:
+            /*
             [self showMessage:@"CIE non abilitata" withTitle:@"Verifica CIE" exitAfter:false];
             return;
+            */
             break;
+            
             
         case CKR_CANCEL:
             break;
@@ -315,19 +322,10 @@ CK_RV completedCallback(string& PAN,
         case CKR_OK:
         {
             [self showMessage:@"CIE disabilitata con successo" withTitle:@"CIE disabilitata" exitAfter:NO];
-            
-            self.labelSerialNumber.stringValue = @"";
-            self.labelCardHolder.stringValue = @"";
-            
-            NSString* pan = [NSUserDefaults.standardUserDefaults objectForKey:@"serialnumber"];
+
             [cieList removeCie:pan];
-            
-            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"serialnumber"];
-            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"cardholder"];
-            
-            if( [NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"])
-                [NSUserDefaults.standardUserDefaults removeObjectForKey:@"efSeriale"];
-            
+            [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
+
             [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
             [NSUserDefaults.standardUserDefaults synchronize];
                         
@@ -500,22 +498,14 @@ CK_RV completedCallback(string& PAN,
                     
                 case CKR_OK:
                     [self showMessage:@"L'abilitazione della CIE è avvennuta con successo. Allontanare la card dal lettore" withTitle:@"CIE Abilitata" exitAfter:NO];
-                    
-                    self.labelSerialNumber.stringValue = [NSString stringWithUTF8String:sEfSeriale.c_str()];
-                    self.labelCardHolder.stringValue = [NSString stringWithUTF8String:sName.c_str()];
-                    
+
                     NSString *PAN = [[NSString alloc] initWithCString:sPAN.c_str() encoding:NSMacOSRomanStringEncoding];
                     
                     NSString *serialNumber = [[NSString alloc] initWithCString:sEfSeriale.c_str() encoding:NSMacOSRomanStringEncoding];
                     
                     NSString *name = [[NSString alloc] initWithCString:sName.c_str() encoding:NSMacOSRomanStringEncoding];
-                    
-                    [NSUserDefaults.standardUserDefaults setObject:self.labelSerialNumber.stringValue forKey:@"efSeriale"];
-                    [NSUserDefaults.standardUserDefaults setObject:PAN forKey:@"serialnumber"];
-                    [NSUserDefaults.standardUserDefaults setObject:self.labelCardHolder.stringValue forKey:@"cardholder"];
-                    [NSUserDefaults.standardUserDefaults synchronize];
-                    
-                    Cie *cie = [[Cie alloc] init:name serial:serialNumber];
+
+                    Cie *cie = [[Cie alloc] init:name serial:serialNumber pan:PAN];
                     [cieList addCie:PAN owner:cie];
                     
                     [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
@@ -894,9 +884,6 @@ CK_RV completedCallback(string& PAN,
 {
     if(returnCode == NSAlertFirstButtonReturn)
     {
-            self.labelSerialNumber.stringValue = @"";
-            self.labelCardHolder.stringValue = @"";
-            
             self.homeFirstPageView.hidden = NO;
             self.homeSecondPageView.hidden = YES;
             self.homeThirdPageView.hidden = YES;
@@ -918,10 +905,6 @@ CK_RV completedCallback(string& PAN,
             NSTextField* txtField = [self.view viewWithTag:1];
             [txtField selectText:nil];
     }else{
-        self.labelSerialNumber.stringValue = @"Per visualizzarlo occorre\nrifare l'abbinamento";
-        
-        [self.labelSerialNumber sizeToFit];
-        self.labelCardHolder.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"];
         
         [self showHomeFourthPage];
     }
@@ -954,28 +937,21 @@ CK_RV completedCallback(string& PAN,
             
         }
         
-        if((![NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"]) and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
+        [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
+
+        if ([[cieList getDictionary] count] > 0){
+            [self showHomeFourthPage];
+        }
+        else if((![NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"]) and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
         {
-            
-            self.labelCardHolder.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"];
-            
-            
-            self.labelSerialNumber.stringValue = @"Per visualizzarlo occorre\nrifare l'abbinamento";
-            
             [self askRiabbina:@"E' necessario effettuare un nuovo abbinamento. Procedere?" withTitle:@"Abbinare nuovamente la CIE"];
             
         }else if([NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"] and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
         {
-            self.labelSerialNumber.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"];
-            
-            self.labelCardHolder.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"];
-            
             [self showHomeFourthPage];
         }
         else
         {
-            self.labelSerialNumber.stringValue = @"";
-            self.labelCardHolder.stringValue = @"";
             
             //    if(self.homeFirstPageView.hidden)
             //    {
@@ -987,8 +963,6 @@ CK_RV completedCallback(string& PAN,
             self.cambioPINOKPageView.hidden = YES;
             self.sbloccoPageView.hidden = YES;
             self.sbloccoOKPageView.hidden = YES;
-            self.helpPageView.hidden = YES;
-            self.infoPageView.hidden = YES;
             
             for(int i = 1; i < 9; i++)
             {
@@ -1051,6 +1025,7 @@ CK_RV completedCallback(string& PAN,
 
 - (void) showHomeFourthPage
 {
+    [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
     
     NSLog(@"CIAO");
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1287,12 +1262,41 @@ CK_RV completedCallback(string& PAN,
         [alert addButtonWithTitle:@"No"];
         [alert setMessageText:title];
         [alert setInformativeText:message];
+
         [alert setAlertStyle:NSAlertStyleInformational];
         
         [alert beginSheetModalForWindow:self.view.window modalDelegate:self didEndSelector:@selector(askRemoveDidEnd:returnCode:contextInfo:) contextInfo:nil];
     });
 }
 
+- (void) askRemoveAll: (NSString*) message withTitle: (NSString*) title
+{
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:@"SI"];
+        [alert addButtonWithTitle:@"No"];
+        [alert setMessageText:title];
+        [alert setInformativeText:message];
+
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert beginSheetModalForWindow:self.view.window modalDelegate:self didEndSelector:@selector(askRemoveAllDidEnd:returnCode:contextInfo:) contextInfo:nil];
+    });
+}
+
+- (void)askRemoveAllDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(bool*)contextInfo{
+    
+    //TODO: @PDG verifica se il comportamento è corretto.
+    
+    NSArray *cieArr = [[cieList getDictionary] allValues];
+    
+    for (Cie *cie in cieArr) {
+        removingCie = cie;
+        [self disabilita];
+    }
+
+}
 
 - (void)askRemoveDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(bool*)contextInfo
 {
@@ -1300,5 +1304,38 @@ CK_RV completedCallback(string& PAN,
         [self disabilita];
 }
 
+#pragma mark - CarouselViewDelegate
+
+- (void)shouldAddCard {
+    self.homeFirstPageView.hidden = NO;
+    self.homeSecondPageView.hidden = YES;
+    self.homeThirdPageView.hidden = YES;
+    self.homeFourthPageView.hidden = YES;
+    self.cambioPINPageView.hidden = YES;
+    self.cambioPINOKPageView.hidden = YES;
+    self.sbloccoPageView.hidden = YES;
+    self.sbloccoOKPageView.hidden = YES;
+    self.helpPageView.hidden = YES;
+    self.infoPageView.hidden = YES;
+    
+    for(int i = 1; i < 9; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    NSTextField* txtField = [self.view viewWithTag:1];
+    [txtField selectText:nil];
+}
+
+- (void)shouldRemoveAllCards {
+    [self askRemoveAll:@"Vuoi rimuovere tutte le CIE attualmente abbinate?" withTitle:@"Rimozione CIE"];
+}
+
+- (void)shouldRemoveCard:(nonnull Cie *)card {
+    removingCie = card;
+    [self askRemove:[NSString stringWithFormat:@"Vuoi rimuovere la CIE %@?", [card getSerialNumber]] withTitle:@"Rimozione CIE"];
+}
 
 @end

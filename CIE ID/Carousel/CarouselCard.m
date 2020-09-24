@@ -90,39 +90,39 @@
 
         switch (mode) {
             case CarouselCardSizeModeSmall:
-                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:9]];
-                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:12]];
-                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:9]];
-                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:12]];
-                strongSelf.cardImageHeight.constant = 86;
-                strongSelf.cardBottomDistance.constant = 10;
-                strongSelf.numeroCartaLabelHeight.constant = 12;
-                strongSelf.numeroCartaValueHeight.constant = 33;
-                strongSelf.fieldsDistance.constant = 5;
-                strongSelf.intestatarioLabelHeight.constant = 12;
-                strongSelf.intestatarioValueHeight.constant = 33;
-                strongSelf.leading1.constant = 19;
-                strongSelf.leading2.constant = 19;
-                strongSelf.leading3.constant = 19;
-                strongSelf.leading4.constant = 19;
+                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:8]]; //9
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:11]]; // 12
+                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:8]]; //9
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:11]]; // 12
+                strongSelf.cardImageHeight.constant = 76; //86;
+                strongSelf.cardBottomDistance.constant = 9; //10;
+                strongSelf.numeroCartaLabelHeight.constant = 11; //12;
+                strongSelf.numeroCartaValueHeight.constant = 29; //33;
+                strongSelf.fieldsDistance.constant = 4; //5;
+                strongSelf.intestatarioLabelHeight.constant = 11; //12;
+                strongSelf.intestatarioValueHeight.constant = 29; //33;
+                strongSelf.leading1.constant = 17; //19;
+                strongSelf.leading2.constant = 17; //19;
+                strongSelf.leading3.constant = 17; //19;
+                strongSelf.leading4.constant = 17; //19;
                 break;
                 
             case CarouselCardSizeModeRegular:
-                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:14]];
-                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:20]];
-                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:14]];
-                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:20]];
-                strongSelf.cardImageHeight.constant = 130;
-                strongSelf.cardBottomDistance.constant = 16;
-                strongSelf.numeroCartaLabelHeight.constant = 20;
-                strongSelf.numeroCartaValueHeight.constant = 50;
-                strongSelf.fieldsDistance.constant = 8;
-                strongSelf.intestatarioLabelHeight.constant = 20;
-                strongSelf.intestatarioValueHeight.constant = 50;
-                strongSelf.leading1.constant = 30;
-                strongSelf.leading2.constant = 30;
-                strongSelf.leading3.constant = 30;
-                strongSelf.leading4.constant = 30;
+                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:12]]; //14
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:17]]; // 20
+                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:12]]; // 14
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:17]]; // 20
+                strongSelf.cardImageHeight.constant = 113; //130;
+                strongSelf.cardBottomDistance.constant = 14; //16;
+                strongSelf.numeroCartaLabelHeight.constant = 17; //20;
+                strongSelf.numeroCartaValueHeight.constant = 43; //50;
+                strongSelf.fieldsDistance.constant = 7; //8;
+                strongSelf.intestatarioLabelHeight.constant = 17; //20;
+                strongSelf.intestatarioValueHeight.constant = 43; //50;
+                strongSelf.leading1.constant = 26; //30;
+                strongSelf.leading2.constant = 26; //30;
+                strongSelf.leading3.constant = 26; //30;
+                strongSelf.leading4.constant = 26; //30;
                 
             default:
                 break;
@@ -144,7 +144,7 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(weakSelf) strongSelf = weakSelf;
-        [strongSelf.numeroCartaValue setStringValue: [card getSerialNumner]];
+        [strongSelf.numeroCartaValue setStringValue: [card getSerialNumber]];
         [strongSelf.intestatarioValue setStringValue: [card getName]];
     });
 
