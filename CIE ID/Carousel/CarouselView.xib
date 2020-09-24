@@ -35,15 +35,21 @@
                                     <rect key="frame" x="150" y="0.0" width="150" height="60"/>
                                     <subviews>
                                         <button wantsLayer="YES" verticalHuggingPriority="750" id="lBv-mt-BPx">
-                                            <rect key="frame" x="12" y="12" width="128" height="32"/>
+                                            <rect key="frame" x="18" y="19" width="116" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Aggiungi carta" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iKY-9Q-2Ni">
+                                            <buttonCell key="cell" type="bevel" title="Aggiungi carta" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="iKY-9Q-2Ni">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
+                                            <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="deviceWhite"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
                                                     <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -56,6 +62,9 @@ DQ
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
                                                     <color key="value" name="customViewColor"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                    <integer key="value" value="0"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
@@ -71,15 +80,21 @@ DQ
                                     <rect key="frame" x="0.0" y="0.0" width="150" height="60"/>
                                     <subviews>
                                         <button wantsLayer="YES" verticalHuggingPriority="750" id="sup-6g-GcF">
-                                            <rect key="frame" x="14" y="12" width="123" height="32"/>
+                                            <rect key="frame" x="20" y="19" width="111" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Rimuovi carta" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zvG-tI-aaI">
+                                            <buttonCell key="cell" type="bevel" title="Rimuovi carta" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="zvG-tI-aaI">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
+                                            <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="deviceWhite"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
                                                     <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -92,6 +107,9 @@ DQ
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
                                                     <color key="value" name="customViewColor"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                    <integer key="value" value="0"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
@@ -134,15 +152,21 @@ DQ
                                     <rect key="frame" x="0.0" y="0.0" width="272" height="60"/>
                                     <subviews>
                                         <button wantsLayer="YES" verticalHuggingPriority="750" id="DFU-mO-K3S">
-                                            <rect key="frame" x="75" y="12" width="121" height="32"/>
+                                            <rect key="frame" x="81" y="19" width="109" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Rimuovi tutte" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="BHR-gp-iDq">
+                                            <buttonCell key="cell" type="bevel" title="Rimuovi tutte" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="BHR-gp-iDq">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
+                                            <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="deviceWhite"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
                                                     <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -167,15 +191,21 @@ DQ
                                     <rect key="frame" x="574" y="0.0" width="272" height="60"/>
                                     <subviews>
                                         <button wantsLayer="YES" verticalHuggingPriority="750" id="5iI-1X-Foj">
-                                            <rect key="frame" x="72" y="12" width="128" height="32"/>
+                                            <rect key="frame" x="78" y="19" width="116" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Aggiungi carta" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t6z-AN-K3S">
+                                            <buttonCell key="cell" type="bevel" title="Aggiungi carta" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="t6z-AN-K3S">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
+                                            <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="deviceWhite"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
                                                     <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -200,15 +230,21 @@ DQ
                                     <rect key="frame" x="272" y="0.0" width="302" height="60"/>
                                     <subviews>
                                         <button wantsLayer="YES" verticalHuggingPriority="750" id="GQI-HK-VP8">
-                                            <rect key="frame" x="69" y="12" width="195" height="32"/>
+                                            <rect key="frame" x="75" y="19" width="183" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Rimuovi carta selezionata" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TI8-Mm-hBe">
+                                            <buttonCell key="cell" type="bevel" title="Rimuovi carta selezionata" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="TI8-Mm-hBe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
+                                            <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="deviceWhite"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
                                                     <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>

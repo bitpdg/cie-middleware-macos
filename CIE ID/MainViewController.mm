@@ -1286,14 +1286,14 @@ CK_RV completedCallback(string& PAN,
 }
 
 - (void)askRemoveAllDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(bool*)contextInfo{
-    
-    //TODO: @PDG verifica se il comportamento è corretto.
-    
-    NSArray *cieArr = [[cieList getDictionary] allValues];
-    
-    for (Cie *cie in cieArr) {
-        removingCie = cie;
-        [self disabilita];
+
+    if(returnCode == NSAlertFirstButtonReturn) {
+        NSArray *cieArr = [[cieList getDictionary] allValues];
+        
+        for (Cie *cie in cieArr) {
+            removingCie = cie;
+            [self disabilita];
+        }
     }
 
 }
