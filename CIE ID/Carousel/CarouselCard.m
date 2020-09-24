@@ -1,0 +1,157 @@
+//
+//  CarouselCard.m
+//  CIE ID
+//
+
+
+#import "CarouselCard.h"
+
+@interface CarouselCard() {
+    Cie *cie;
+}
+
+@property (weak) IBOutlet NSImageView *cardImageView;
+@property (weak) IBOutlet NSTextField *numeroCartaLabel;
+@property (weak) IBOutlet NSTextField *numeroCartaValue;
+@property (weak) IBOutlet NSTextField *intestatarioLabel;
+@property (weak) IBOutlet NSTextField *intestatarioValue;
+
+@property (weak) IBOutlet NSLayoutConstraint *cardImageHeight;
+
+@property (weak) IBOutlet NSLayoutConstraint *cardBottomDistance;
+
+@property (weak) IBOutlet NSLayoutConstraint *numeroCartaLabelHeight;
+@property (weak) IBOutlet NSLayoutConstraint *numeroCartaValueHeight;
+
+@property (weak) IBOutlet NSLayoutConstraint *fieldsDistance;
+
+@property (weak) IBOutlet NSLayoutConstraint *intestatarioLabelHeight;
+@property (weak) IBOutlet NSLayoutConstraint *intestatarioValueHeight;
+
+@property (weak) IBOutlet NSLayoutConstraint *leading1;
+@property (weak) IBOutlet NSLayoutConstraint *leading2;
+@property (weak) IBOutlet NSLayoutConstraint *leading3;
+@property (weak) IBOutlet NSLayoutConstraint *leading4;
+
+@end
+
+@implementation CarouselCard
+
+- (instancetype)initWithCoder:(NSCoder *)coder{
+    self = [super initWithCoder:coder];
+    [self setupView];
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect{
+    self = [super initWithFrame:frameRect];
+    [self setupView];
+    return self;
+}
+
+- (void) setupView {
+    NSView *view = [self viewFromNibForClass];
+    
+    [view setFrame:[self bounds]];
+    [view setAutoresizingMask:NSViewMaxXMargin|NSViewMaxYMargin];
+
+    [self addSubview:view];
+}
+
+// Loads a XIB file into a view and returns this view.
+- (NSView *) viewFromNibForClass {
+    NSArray *topLevelObjects;
+    
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    
+    if ([mainBundle loadNibNamed:@"CarouselCard" owner:self topLevelObjects:&topLevelObjects]) {
+        for (id item in topLevelObjects) {
+            if ([item isKindOfClass:[NSView class]]) {
+                return item;
+            }
+        }
+    }
+    return nil;
+}
+
+#pragma mark - Public methods
+
+- (void) setupWithSizeMode:(CarouselCardSizeMode)mode{
+    
+    NSRect newRect = _cardImageView.frame;
+    newRect.size.width = self.frame.size.width;
+    
+    __weak __typeof__(self) weakSelf = self;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        
+        [strongSelf.cardImageView setFrame:newRect];
+
+        switch (mode) {
+            case CarouselCardSizeModeSmall:
+                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:9]];
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:12]];
+                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:9]];
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:12]];
+                strongSelf.cardImageHeight.constant = 86;
+                strongSelf.cardBottomDistance.constant = 10;
+                strongSelf.numeroCartaLabelHeight.constant = 12;
+                strongSelf.numeroCartaValueHeight.constant = 33;
+                strongSelf.fieldsDistance.constant = 5;
+                strongSelf.intestatarioLabelHeight.constant = 12;
+                strongSelf.intestatarioValueHeight.constant = 33;
+                strongSelf.leading1.constant = 19;
+                strongSelf.leading2.constant = 19;
+                strongSelf.leading3.constant = 19;
+                strongSelf.leading4.constant = 19;
+                break;
+                
+            case CarouselCardSizeModeRegular:
+                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:14]];
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:20]];
+                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:14]];
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:20]];
+                strongSelf.cardImageHeight.constant = 130;
+                strongSelf.cardBottomDistance.constant = 16;
+                strongSelf.numeroCartaLabelHeight.constant = 20;
+                strongSelf.numeroCartaValueHeight.constant = 50;
+                strongSelf.fieldsDistance.constant = 8;
+                strongSelf.intestatarioLabelHeight.constant = 20;
+                strongSelf.intestatarioValueHeight.constant = 50;
+                strongSelf.leading1.constant = 30;
+                strongSelf.leading2.constant = 30;
+                strongSelf.leading3.constant = 30;
+                strongSelf.leading4.constant = 30;
+                
+            default:
+                break;
+        }
+        
+        [strongSelf layoutSubtreeIfNeeded];
+        strongSelf.wantsLayer = YES;
+        strongSelf.needsLayout = YES;
+        strongSelf.needsDisplay = YES;
+        [strongSelf updateConstraints];
+        
+    });
+}
+
+- (void) configureWithCard:(Cie *)card{
+    cie = card;
+    
+    __weak __typeof__(self) weakSelf = self;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        [strongSelf.numeroCartaValue setStringValue: [card getSerialNumner]];
+        [strongSelf.intestatarioValue setStringValue: [card getName]];
+    });
+
+}
+
+- (Cie *) getCard {
+    return cie;
+}
+
+@end

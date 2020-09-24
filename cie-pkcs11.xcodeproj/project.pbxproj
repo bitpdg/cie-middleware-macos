@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0883C2E4251C94290054055E /* CarouselView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0883C2DE251C94290054055E /* CarouselView.m */; };
+		0883C2E5251C94290054055E /* CarouselCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0883C2DF251C94290054055E /* CarouselCard.xib */; };
+		0883C2E6251C94290054055E /* CarouselView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0883C2E1251C94290054055E /* CarouselView.xib */; };
+		0883C2E7251C94290054055E /* CarouselCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 0883C2E2251C94290054055E /* CarouselCard.m */; };
 		461398B8C02047C25F03D065 /* Pods_CIE_ID.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC86202F63F36F82504EC0B3 /* Pods_CIE_ID.framework */; };
 		5CA6E27FF73910B2FFB64484 /* libPods-cie-pkcs11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A3612AA9E73AB30473645 /* libPods-cie-pkcs11.a */; };
 		7663CDD92518DF6A00FDC547 /* CieList.m in Sources */ = {isa = PBXBuildFile; fileRef = 7663CDD82518DF6A00FDC547 /* CieList.m */; };
@@ -211,6 +215,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0883C2DE251C94290054055E /* CarouselView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CarouselView.m; sourceTree = "<group>"; };
+		0883C2DF251C94290054055E /* CarouselCard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CarouselCard.xib; sourceTree = "<group>"; };
+		0883C2E0251C94290054055E /* CarouselView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CarouselView.h; sourceTree = "<group>"; };
+		0883C2E1251C94290054055E /* CarouselView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CarouselView.xib; sourceTree = "<group>"; };
+		0883C2E2251C94290054055E /* CarouselCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CarouselCard.m; sourceTree = "<group>"; };
+		0883C2E3251C94290054055E /* CarouselCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CarouselCard.h; sourceTree = "<group>"; };
 		228A3612AA9E73AB30473645 /* libPods-cie-pkcs11.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-cie-pkcs11.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F05ABF04FC862DB88E240A2 /* Pods-CIE ID.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CIE ID.release.xcconfig"; path = "Pods/Target Support Files/Pods-CIE ID/Pods-CIE ID.release.xcconfig"; sourceTree = "<group>"; };
 		438D493AABE95B9738D331F7 /* Pods-cie-pkcs11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cie-pkcs11.release.xcconfig"; path = "Pods/Target Support Files/Pods-cie-pkcs11/Pods-cie-pkcs11.release.xcconfig"; sourceTree = "<group>"; };
@@ -481,6 +491,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0883C2DD251C940E0054055E /* Carousel */ = {
+			isa = PBXGroup;
+			children = (
+				0883C2E3251C94290054055E /* CarouselCard.h */,
+				0883C2E2251C94290054055E /* CarouselCard.m */,
+				0883C2DF251C94290054055E /* CarouselCard.xib */,
+				0883C2E0251C94290054055E /* CarouselView.h */,
+				0883C2DE251C94290054055E /* CarouselView.m */,
+				0883C2E1251C94290054055E /* CarouselView.xib */,
+			);
+			path = Carousel;
+			sourceTree = "<group>";
+		};
 		B7FB7DAC107919BD2BEDD28E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -531,6 +554,7 @@
 		E544F56421BFAFC60038B2CA /* CIE ID */ = {
 			isa = PBXGroup;
 			children = (
+				0883C2DD251C940E0054055E /* Carousel */,
 				7663CDD72518DF6A00FDC547 /* CieList.h */,
 				7663CDD82518DF6A00FDC547 /* CieList.m */,
 				E544F56521BFAFC60038B2CA /* AppDelegate.h */,
@@ -1121,6 +1145,8 @@
 			files = (
 				E544F56C21BFAFC90038B2CA /* Assets.xcassets in Resources */,
 				E544F56F21BFAFC90038B2CA /* Main.storyboard in Resources */,
+				0883C2E6251C94290054055E /* CarouselView.xib in Resources */,
+				0883C2E5251C94290054055E /* CarouselCard.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1227,11 +1253,13 @@
 			files = (
 				E544F57221BFAFC90038B2CA /* main.m in Sources */,
 				7663CDD92518DF6A00FDC547 /* CieList.m in Sources */,
+				0883C2E4251C94290054055E /* CarouselView.m in Sources */,
 				E5A6019622CA91CD0003B79E /* PINNoticeViewController.m in Sources */,
 				E544F56721BFAFC60038B2CA /* AppDelegate.m in Sources */,
 				E544F57921BFB06A0038B2CA /* MainViewController.mm in Sources */,
 				7663CDDC2518F09E00FDC547 /* Cie.m in Sources */,
 				E59DCCDF21C3BB7300CE4790 /* IntroViewController.m in Sources */,
+				0883C2E7251C94290054055E /* CarouselCard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
