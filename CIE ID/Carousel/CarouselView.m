@@ -7,9 +7,17 @@
 #import "CarouselView.h"
 #import "CarouselCard.h"
 
+#define RADIO_BUTTON_LEADING 5
+#define RADIO_BUTTON_WIDTH 22
+#define RADIO_BUTTON_HEIGHT 18
+
 @interface CarouselView(){
     NSInteger index;
     NSArray <Cie *> *cards;
+    
+    NSMutableArray <NSButton *> *radioButtons;
+    NSButton *lastInsertedRadioButton;
+    NSView *radioButtonsSubContainer;
 }
 
 @property (weak) IBOutlet NSView *singleCardContainerView;
@@ -20,6 +28,8 @@
 @property (weak) IBOutlet CarouselCard *leftCard;
 @property (weak) IBOutlet CarouselCard *rightCard;
 @property (weak) IBOutlet CarouselCard *mainCard;
+
+@property (weak) IBOutlet NSView *radioButtonsContainer;
 
 @end
 
@@ -114,6 +124,8 @@
     
     cards = cardList;
     
+    [self configureRadioButtons];
+
     if ([cardList count] > 0) {
         [self updateCards];
     }
@@ -161,6 +173,8 @@
     }
     
     [self updateCards];
+    
+    [self updateRadioButtonAppearance];
 
 }
 
@@ -172,9 +186,110 @@
     }
     
     [self updateCards];
+    
+    [self updateRadioButtonAppearance];
 }
 
 #pragma mark - Private methods
+
+- (void) configureRadioButtons{
+    if (radioButtons) {
+        for (NSButton *button in radioButtons) {
+            [button removeFromSuperview];
+        }
+        
+        [radioButtons removeAllObjects];
+    }
+    
+    radioButtons = [NSMutableArray new];
+    
+    if (radioButtonsSubContainer) {
+        [radioButtonsSubContainer removeFromSuperview];
+    }
+    
+    radioButtonsSubContainer = [[NSView alloc] init];
+    
+    lastInsertedRadioButton = nil;
+
+    if ([cards count] > 1){
+
+        for(int i = 0; i < [cards count]; i++){
+            NSButton *radioButton = [self buildRadioButtonWithIndex:i];
+            
+            if (i == 0) {
+                [radioButton setState:NSOnState];
+            }
+            
+            [self enqueueRadioButton:radioButton];
+            
+            [radioButtons addObject:radioButton];
+        }
+        
+        CGFloat width = ([radioButtons count] * RADIO_BUTTON_WIDTH) + (([radioButtons count] -1) * RADIO_BUTTON_LEADING);
+
+        [radioButtonsSubContainer setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.radioButtonsContainer addSubview:radioButtonsSubContainer];
+        
+        [radioButtonsSubContainer addConstraint:[NSLayoutConstraint constraintWithItem:radioButtonsSubContainer attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:width]];
+        
+        [radioButtonsSubContainer addConstraint:[NSLayoutConstraint constraintWithItem:radioButtonsSubContainer attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:RADIO_BUTTON_HEIGHT]];
+        
+        [self.radioButtonsContainer addConstraint:[NSLayoutConstraint constraintWithItem:self.radioButtonsContainer attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:radioButtonsSubContainer attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+        
+        [self.radioButtonsContainer addConstraint:[NSLayoutConstraint constraintWithItem:self.radioButtonsContainer attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:radioButtonsSubContainer attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
+        
+    }
+}
+
+- (NSButton *) buildRadioButtonWithIndex:(NSInteger)index{
+    NSButton *radioButton = [NSButton radioButtonWithTitle:@"" target:self action:@selector(radioButtonPressed:)];
+    [radioButton setTag:index];
+    [radioButton setAutoresizingMask:NSViewNotSizable];
+    
+    return radioButton;
+}
+
+- (void) enqueueRadioButton:(NSButton *) button {
+    
+    [button setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [radioButtonsSubContainer addSubview:button];
+    
+    [button addConstraint:[NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:RADIO_BUTTON_WIDTH]];
+    
+    [button addConstraint:[NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:RADIO_BUTTON_HEIGHT]];
+    
+    [radioButtonsSubContainer addConstraint:[NSLayoutConstraint constraintWithItem:radioButtonsSubContainer attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:button attribute:NSLayoutAttributeTop multiplier:1 constant:0]];
+    
+    if (lastInsertedRadioButton) {
+        [radioButtonsSubContainer addConstraint:[NSLayoutConstraint constraintWithItem:lastInsertedRadioButton attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:button attribute:NSLayoutAttributeLeading multiplier:1 constant:-RADIO_BUTTON_LEADING]];
+    }
+    else {
+        [radioButtonsSubContainer addConstraint:[NSLayoutConstraint constraintWithItem:radioButtonsSubContainer attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:button attribute:NSLayoutAttributeLeading multiplier:1 constant:0]];
+    }
+
+    lastInsertedRadioButton = button;
+}
+
+- (void) radioButtonPressed:(NSButton *)sender {
+    index = sender.tag;
+    [self updateCards];
+}
+
+- (void) updateRadioButtonAppearance{
+    if (!radioButtons) {
+        return;
+    }
+    
+    for (int i = 0; i<radioButtons.count; i++) {
+        NSButton *current = radioButtons[i];
+        if (i == index) {
+            [current setState:NSOnState];
+        }
+        else {
+            [current setState:NSOffState];
+        }
+    }
+}
 
 - (void) updateCards {
     if ([cards count] == 0) {
