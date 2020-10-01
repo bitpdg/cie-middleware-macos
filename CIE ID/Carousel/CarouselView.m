@@ -56,6 +56,9 @@
     [_leftCard setupWithSizeMode:CarouselCardSizeModeSmall];
     [_rightCard setupWithSizeMode:CarouselCardSizeModeSmall];
     [_mainCard setupWithSizeMode:CarouselCardSizeModeRegular];
+    
+    [_leftCard setAlphaValue:0.5];
+    [_rightCard setAlphaValue:0.5];
 
     [self addSubview:view];
 }
