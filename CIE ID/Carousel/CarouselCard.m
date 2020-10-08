@@ -76,6 +76,10 @@
 
 #pragma mark - Public methods
 
+- (void) setNameLabelOnOneLine {
+    [_intestatarioValue setUsesSingleLineMode:YES];
+}
+
 - (void) setupWithSizeMode:(CarouselCardSizeMode)mode{
     
     NSRect newRect = _cardImageView.frame;

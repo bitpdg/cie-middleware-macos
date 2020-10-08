@@ -56,6 +56,7 @@
     [_leftCard setupWithSizeMode:CarouselCardSizeModeSmall];
     [_rightCard setupWithSizeMode:CarouselCardSizeModeSmall];
     [_mainCard setupWithSizeMode:CarouselCardSizeModeRegular];
+    [_mainCard setNameLabelOnOneLine];
     
     [_leftCard setAlphaValue:0.5];
     [_rightCard setAlphaValue:0.5];

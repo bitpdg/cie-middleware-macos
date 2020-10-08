@@ -18,6 +18,8 @@ typedef NS_ENUM(NSInteger, CarouselCardSizeMode) {
 - (void) setupWithSizeMode:(CarouselCardSizeMode)mode;
 - (void) configureWithCard:(Cie *)card;
 
+- (void) setNameLabelOnOneLine;
+
 - (Cie *) getCard;
 
 @end
