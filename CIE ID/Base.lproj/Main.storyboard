@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="16096"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="15705"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -625,9 +625,8 @@ trattalo con cautela.</string>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </view>
-                                    <view focusRingType="none" appearanceType="aqua" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWW-mh-vJN">
+                                    <view focusRingType="none" appearanceType="aqua" translatesAutoresizingMaskIntoConstraints="NO" id="qWW-mh-vJN">
                                         <rect key="frame" x="0.0" y="0.0" width="550" height="510"/>
-                                        <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jgI-41-ekk">
                                                 <rect key="frame" x="72" y="416" width="405" height="57"/>
@@ -647,74 +646,111 @@ trattalo con cautela.</string>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0QW-wr-CHb">
-                                                <rect key="frame" x="223" y="23" width="110" height="21"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="squareTextured" title="Abbina" bezelStyle="texturedSquare" alignment="center" inset="2" id="2vc-WY-mDF">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
-                                                </buttonCell>
-                                                <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeButtonColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                                        <color key="value" name="customViewColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
-                                                        <color key="value" name="customViewColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                                        <real key="value" value="0.0"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="abbina:" target="XfG-lQ-9wD" id="SSu-3E-TdE"/>
-                                                </connections>
-                                            </button>
-                                            <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZc-9I-XsZ">
-                                                <rect key="frame" x="120" y="23" width="110" height="21"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="squareTextured" title="Annulla" bezelStyle="texturedSquare" alignment="center" inset="2" id="6cT-7m-Dko">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
-                                                </buttonCell>
-                                                <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeButtonColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                                        <color key="value" name="customViewColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
-                                                        <color key="value" name="customViewColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                                        <real key="value" value="0.0"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="annulla:" target="XfG-lQ-9wD" id="zha-Gj-rxd"/>
-                                                </connections>
-                                            </button>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="FnK-kv-rCM">
+                                                <rect key="frame" x="0.0" y="0.0" width="550" height="84"/>
+                                                <subviews>
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="2Md-gy-qrJ" userLabel="abbinaContainer">
+                                                        <rect key="frame" x="225" y="32" width="100" height="21"/>
+                                                        <subviews>
+                                                            <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0QW-wr-CHb">
+                                                                <rect key="frame" x="0.0" y="0.0" width="100" height="21"/>
+                                                                <buttonCell key="cell" type="squareTextured" title="Abbina" bezelStyle="texturedSquare" alignment="center" inset="2" id="2vc-WY-mDF">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <userDefinedRuntimeAttributes>
+                                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                                            <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                        </userDefinedRuntimeAttribute>
+                                                                    </userDefinedRuntimeAttributes>
+                                                                </buttonCell>
+                                                                <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
+                                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeButtonColor">
+                                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                                                        <color key="value" name="customViewColor"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
+                                                                        <color key="value" name="customViewColor"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                                        <real key="value" value="0.0"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                </userDefinedRuntimeAttributes>
+                                                                <connections>
+                                                                    <action selector="abbina:" target="XfG-lQ-9wD" id="SSu-3E-TdE"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="21" id="CKZ-Re-enK"/>
+                                                            <constraint firstAttribute="bottom" secondItem="0QW-wr-CHb" secondAttribute="bottom" id="OV4-dW-i6N"/>
+                                                            <constraint firstItem="0QW-wr-CHb" firstAttribute="top" secondItem="2Md-gy-qrJ" secondAttribute="top" id="SEM-4e-zQm"/>
+                                                            <constraint firstItem="0QW-wr-CHb" firstAttribute="leading" secondItem="2Md-gy-qrJ" secondAttribute="leading" id="Vwt-RX-SwN"/>
+                                                            <constraint firstAttribute="trailing" secondItem="0QW-wr-CHb" secondAttribute="trailing" id="Z5V-Oa-NHg"/>
+                                                            <constraint firstAttribute="width" constant="100" id="e4U-1D-4kq"/>
+                                                        </constraints>
+                                                    </customView>
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="8Ta-Y5-2md" userLabel="annullaContainer">
+                                                        <rect key="frame" x="115" y="32" width="100" height="21"/>
+                                                        <subviews>
+                                                            <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vZc-9I-XsZ">
+                                                                <rect key="frame" x="0.0" y="0.0" width="100" height="21"/>
+                                                                <buttonCell key="cell" type="squareTextured" title="Annulla" bezelStyle="texturedSquare" alignment="center" inset="2" id="6cT-7m-Dko">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <userDefinedRuntimeAttributes>
+                                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                                            <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                        </userDefinedRuntimeAttribute>
+                                                                    </userDefinedRuntimeAttributes>
+                                                                </buttonCell>
+                                                                <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
+                                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeButtonColor">
+                                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                                                        <color key="value" name="customViewColor"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
+                                                                        <color key="value" name="customViewColor"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                                        <real key="value" value="0.0"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                </userDefinedRuntimeAttributes>
+                                                                <connections>
+                                                                    <action selector="annulla:" target="XfG-lQ-9wD" id="zha-Gj-rxd"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstAttribute="trailing" secondItem="vZc-9I-XsZ" secondAttribute="trailing" id="4Xy-hT-28M"/>
+                                                            <constraint firstAttribute="bottom" secondItem="vZc-9I-XsZ" secondAttribute="bottom" id="Kz4-Uq-jXh"/>
+                                                            <constraint firstItem="vZc-9I-XsZ" firstAttribute="top" secondItem="8Ta-Y5-2md" secondAttribute="top" id="OeE-C9-EpU"/>
+                                                            <constraint firstItem="vZc-9I-XsZ" firstAttribute="leading" secondItem="8Ta-Y5-2md" secondAttribute="leading" id="aQl-L5-udL"/>
+                                                            <constraint firstAttribute="width" constant="100" id="c36-ez-s8c"/>
+                                                            <constraint firstAttribute="height" constant="21" id="etX-2o-2gc"/>
+                                                        </constraints>
+                                                    </customView>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="2Md-gy-qrJ" firstAttribute="centerX" secondItem="FnK-kv-rCM" secondAttribute="centerX" priority="750" id="SEZ-r2-NIE"/>
+                                                    <constraint firstItem="8Ta-Y5-2md" firstAttribute="leading" secondItem="FnK-kv-rCM" secondAttribute="leading" constant="115" id="bHL-B0-eQL"/>
+                                                    <constraint firstAttribute="height" constant="84" id="cel-cp-TN1"/>
+                                                    <constraint firstAttribute="trailing" secondItem="2Md-gy-qrJ" secondAttribute="trailing" priority="250" constant="115" id="krM-pG-wUf"/>
+                                                    <constraint firstItem="2Md-gy-qrJ" firstAttribute="centerY" secondItem="FnK-kv-rCM" secondAttribute="centerY" id="rA7-DB-w9y"/>
+                                                    <constraint firstItem="8Ta-Y5-2md" firstAttribute="centerY" secondItem="FnK-kv-rCM" secondAttribute="centerY" id="wmL-LF-fBw"/>
+                                                </constraints>
+                                            </customView>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BmZ-fU-7Ac">
                                                 <rect key="frame" x="30" y="150" width="190" height="190"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -850,6 +886,11 @@ trattalo con cautela.</string>
                                                 </textFieldCell>
                                             </textField>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="FnK-kv-rCM" secondAttribute="trailing" id="N3o-WL-dgr"/>
+                                            <constraint firstAttribute="bottom" secondItem="FnK-kv-rCM" secondAttribute="bottom" id="RJL-hy-Yo1"/>
+                                            <constraint firstItem="FnK-kv-rCM" firstAttribute="leading" secondItem="qWW-mh-vJN" secondAttribute="leading" id="cTz-7W-jgg"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="customViewColor"/>
@@ -1115,7 +1156,11 @@ DQ
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="5Hi-tR-7XT" firstAttribute="top" secondItem="6OI-bz-nRs" secondAttribute="top" id="CSJ-cG-Dv9"/>
+                                    <constraint firstItem="qWW-mh-vJN" firstAttribute="top" secondItem="6OI-bz-nRs" secondAttribute="top" id="GJ9-HQ-49n"/>
+                                    <constraint firstAttribute="trailing" secondItem="qWW-mh-vJN" secondAttribute="trailing" id="PXT-xO-DKi"/>
+                                    <constraint firstItem="qWW-mh-vJN" firstAttribute="leading" secondItem="6OI-bz-nRs" secondAttribute="leading" id="TCF-w6-Snh"/>
                                     <constraint firstAttribute="trailing" secondItem="5Hi-tR-7XT" secondAttribute="trailing" id="bcO-jc-h1j"/>
+                                    <constraint firstAttribute="bottom" secondItem="qWW-mh-vJN" secondAttribute="bottom" id="dN5-dh-43v"/>
                                     <constraint firstAttribute="bottom" secondItem="5Hi-tR-7XT" secondAttribute="bottom" id="fS2-Df-8JL"/>
                                 </constraints>
                             </customView>
@@ -1138,6 +1183,8 @@ DQ
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="abbinaButtonWhenAnnullaInvisible" destination="SEZ-r2-NIE" id="lgq-il-IqS"/>
+                        <outlet property="abbinaButtonWhenAnnullaVisible" destination="krM-pG-wUf" id="bum-dS-c0M"/>
                         <outlet property="assistenzaImageView" destination="Jq5-Jt-6Ss" id="ehu-2y-l90"/>
                         <outlet property="btnAbbina" destination="0QW-wr-CHb" id="jto-bc-3RS"/>
                         <outlet property="btnAnnulla" destination="vZc-9I-XsZ" id="8po-Yd-gSa"/>
@@ -1505,7 +1552,7 @@ trattalo con cautela.</string>
                             <rect key="frame" x="214" y="257" width="234" height="24"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Numero carta" id="46e-Ef-2t8">
-                                <font key="font" metaFont="menu" size="14"/>
+                                <font key="font" metaFont="label" size="14"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
@@ -1523,7 +1570,7 @@ trattalo con cautela.</string>
                             <rect key="frame" x="214" y="202" width="234" height="24"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Intestatario" id="14N-qK-xmp">
-                                <font key="font" metaFont="menu" size="14"/>
+                                <font key="font" metaFont="label" size="14"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
@@ -2116,19 +2163,19 @@ DQ
         </scene>
     </scenes>
     <resources>
-        <image name="Logo_Cie_ID_Windowed" width="155.5" height="154"/>
+        <image name="Logo_Cie_ID_Windowed" width="156" height="154"/>
         <image name="Risorsa 14" width="30" height="30"/>
         <image name="Risorsa 15" width="30" height="30"/>
         <image name="Risorsa 16" width="30" height="30"/>
         <image name="Risorsa 17" width="30" height="30"/>
         <image name="Risorsa 18" width="30" height="30"/>
         <image name="Risorsa 19" width="30" height="30"/>
-        <image name="flusso_intro_01" width="612.5" height="388"/>
+        <image name="flusso_intro_01" width="613" height="388"/>
         <image name="flusso_intro_02" width="651" height="373"/>
-        <image name="icona_assistenza" width="140.5" height="38.5"/>
-        <image name="icona_lettore_card_white" width="191.5" height="191.5"/>
-        <image name="icona_sblocco_carta" width="116" height="38.5"/>
-        <image name="logo-cie" width="42" height="20"/>
+        <image name="icona_assistenza" width="141" height="39"/>
+        <image name="icona_lettore_card_white" width="192" height="192"/>
+        <image name="icona_sblocco_carta" width="116" height="39"/>
+        <image name="logo-cie" width="84" height="40"/>
         <image name="logoIPZS" width="99" height="40"/>
         <image name="logo_MinisteroInterno" width="130" height="40"/>
         <namedColor name="customDarkBackgroundColor">

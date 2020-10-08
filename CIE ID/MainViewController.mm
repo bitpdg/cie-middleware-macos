@@ -32,6 +32,10 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
     Cie *removingCie;
 }
 
+@property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
+
+@property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaInvisible;
+
 @end
 
 @implementation MainViewController
@@ -88,6 +92,7 @@ void* hModule;
 
     [self showHomeFirstPage];
     
+    [self updateAbbinaAndAnnullaLayout];
     
     if(![NSUserDefaults.standardUserDefaults objectForKey:@"dontShowIntro"])
     {
@@ -1042,21 +1047,8 @@ CK_RV completedCallback(string& PAN,
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
-        if( [[cieList getDictionary] count] >= 1)
-        {
-            self.btnAnnulla.hidden = NO;
-            NSLayoutConstraint *btnAnnullaConstraint = [NSLayoutConstraint
-            constraintWithItem:self.btnAbbina attribute:NSLayoutAttributeLeading
-                                                        relatedBy:NSLayoutRelationEqual toItem:self.btnAbbina attribute:
-            NSLayoutAttributeTrailing multiplier:1.0 constant:10];
-            
-            [self.homeFirstPageView addConstraint:btnAnnullaConstraint];
-            
-        }else
-        {
-            self.btnAnnulla.hidden = YES;
-        }
-        
+        [self updateAbbinaAndAnnullaLayout];
+
         self.homeFirstPageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
@@ -1322,6 +1314,23 @@ CK_RV completedCallback(string& PAN,
 {
     if(returnCode == NSAlertFirstButtonReturn)
         [self disabilita];
+}
+
+- (void) updateAbbinaAndAnnullaLayout {
+    if( [[cieList getDictionary] count] >= 1)
+    {
+        self.btnAnnulla.hidden = NO;
+        self.abbinaButtonWhenAnnullaVisible.priority = NSLayoutPriorityDefaultHigh;
+        self.abbinaButtonWhenAnnullaInvisible.priority = NSLayoutPriorityDefaultLow;
+        
+    }else
+    {
+        self.btnAnnulla.hidden = YES;
+        self.abbinaButtonWhenAnnullaVisible.priority = NSLayoutPriorityDefaultLow;
+        self.abbinaButtonWhenAnnullaInvisible.priority = NSLayoutPriorityDefaultHigh;
+    }
+    
+    [self updateViewConstraints];
 }
 
 #pragma mark - CarouselViewDelegate
