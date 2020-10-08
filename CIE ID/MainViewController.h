@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet WKWebView* helpWebView;
 @property IBOutlet WKWebView* infoWebView;
 
+@property (weak) IBOutlet NSButton *btnAbbina;
+@property (weak) IBOutlet NSButton *btnAnnulla;
+
 @property IBOutlet NSImageView* assistenzaImageView;
 @property IBOutlet NSImageView* sbloccoImageView;
 

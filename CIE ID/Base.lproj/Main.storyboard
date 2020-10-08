@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17156"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="16096"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -648,7 +648,7 @@ trattalo con cautela.</string>
                                                 </textFieldCell>
                                             </textField>
                                             <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0QW-wr-CHb">
-                                                <rect key="frame" x="220" y="23" width="110" height="21"/>
+                                                <rect key="frame" x="223" y="23" width="110" height="21"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <buttonCell key="cell" type="squareTextured" title="Abbina" bezelStyle="texturedSquare" alignment="center" inset="2" id="2vc-WY-mDF">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -679,6 +679,40 @@ trattalo con cautela.</string>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
                                                     <action selector="abbina:" target="XfG-lQ-9wD" id="SSu-3E-TdE"/>
+                                                </connections>
+                                            </button>
+                                            <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZc-9I-XsZ">
+                                                <rect key="frame" x="120" y="23" width="110" height="21"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="squareTextured" title="Annulla" bezelStyle="texturedSquare" alignment="center" inset="2" id="6cT-7m-Dko">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                            <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </buttonCell>
+                                                <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeButtonColor">
+                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                                        <color key="value" name="customViewColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTextColor">
+                                                        <color key="value" name="customViewColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                        <real key="value" value="0.0"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="annulla:" target="XfG-lQ-9wD" id="zha-Gj-rxd"/>
                                                 </connections>
                                             </button>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BmZ-fU-7Ac">
@@ -1105,6 +1139,8 @@ DQ
                     </view>
                     <connections>
                         <outlet property="assistenzaImageView" destination="Jq5-Jt-6Ss" id="ehu-2y-l90"/>
+                        <outlet property="btnAbbina" destination="0QW-wr-CHb" id="jto-bc-3RS"/>
+                        <outlet property="btnAnnulla" destination="vZc-9I-XsZ" id="8po-Yd-gSa"/>
                         <outlet property="cambioPINButtonView" destination="lrL-iW-R0U" id="xaW-Ke-Qi1"/>
                         <outlet property="cambioPINOKPageView" destination="gbY-3C-V3N" id="xZV-6g-SgL"/>
                         <outlet property="cambioPINPageView" destination="Qux-KY-phF" id="XzU-be-vxC"/>
@@ -2080,19 +2116,19 @@ DQ
         </scene>
     </scenes>
     <resources>
-        <image name="Logo_Cie_ID_Windowed" width="156" height="154"/>
+        <image name="Logo_Cie_ID_Windowed" width="155.5" height="154"/>
         <image name="Risorsa 14" width="30" height="30"/>
         <image name="Risorsa 15" width="30" height="30"/>
         <image name="Risorsa 16" width="30" height="30"/>
         <image name="Risorsa 17" width="30" height="30"/>
         <image name="Risorsa 18" width="30" height="30"/>
         <image name="Risorsa 19" width="30" height="30"/>
-        <image name="flusso_intro_01" width="613" height="388"/>
+        <image name="flusso_intro_01" width="612.5" height="388"/>
         <image name="flusso_intro_02" width="651" height="373"/>
-        <image name="icona_assistenza" width="141" height="39"/>
-        <image name="icona_lettore_card_white" width="192" height="192"/>
-        <image name="icona_sblocco_carta" width="116" height="39"/>
-        <image name="logo-cie" width="84" height="40"/>
+        <image name="icona_assistenza" width="140.5" height="38.5"/>
+        <image name="icona_lettore_card_white" width="191.5" height="191.5"/>
+        <image name="icona_sblocco_carta" width="116" height="38.5"/>
+        <image name="logo-cie" width="42" height="20"/>
         <image name="logoIPZS" width="99" height="40"/>
         <image name="logo_MinisteroInterno" width="130" height="40"/>
         <namedColor name="customDarkBackgroundColor">

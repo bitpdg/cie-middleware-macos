@@ -372,6 +372,11 @@ CK_RV completedCallback(string& PAN,
     [self showInfoPage];
 }
 
+- (IBAction)annulla:(id)sender {
+    [self showHomeFourthPage];
+}
+
+
 - (IBAction)abbina:(id)sender
 {
     NSString* pin = @"";
@@ -922,6 +927,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+                        
         
         if((![NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
         {
@@ -1027,7 +1033,6 @@ CK_RV completedCallback(string& PAN,
 {
     [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
     
-    NSLog(@"CIAO");
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
@@ -1036,6 +1041,21 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        
+        if( [[cieList getDictionary] count] >= 1)
+        {
+            self.btnAnnulla.hidden = NO;
+            NSLayoutConstraint *btnAnnullaConstraint = [NSLayoutConstraint
+            constraintWithItem:self.btnAbbina attribute:NSLayoutAttributeLeading
+                                                        relatedBy:NSLayoutRelationEqual toItem:self.btnAbbina attribute:
+            NSLayoutAttributeTrailing multiplier:1.0 constant:10];
+            
+            [self.homeFirstPageView addConstraint:btnAnnullaConstraint];
+            
+        }else
+        {
+            self.btnAnnulla.hidden = YES;
+        }
         
         self.homeFirstPageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
