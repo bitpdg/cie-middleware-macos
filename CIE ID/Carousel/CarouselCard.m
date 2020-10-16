@@ -95,9 +95,9 @@
         switch (mode) {
             case CarouselCardSizeModeSmall:
                 [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:8]]; //9
-                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:10]]; // 12
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:11]]; // 12
                 [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:8]]; //9
-                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:10]]; // 12
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:11]]; // 12
                 strongSelf.cardImageHeight.constant = 76; //86;
                 strongSelf.cardBottomDistance.constant = 9; //10;
                 strongSelf.numeroCartaLabelHeight.constant = 11; //12;
@@ -112,10 +112,10 @@
                 break;
                 
             case CarouselCardSizeModeRegular:
-                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:12]]; //14
-                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:14]]; // 20
-                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:12]]; // 14
-                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:14]]; // 20
+                [strongSelf.numeroCartaLabel setFont: [NSFont systemFontOfSize:13]]; //14
+                [strongSelf.numeroCartaValue setFont: [NSFont systemFontOfSize:17]]; // 20
+                [strongSelf.intestatarioLabel setFont: [NSFont systemFontOfSize:13]]; // 14
+                [strongSelf.intestatarioValue setFont: [NSFont systemFontOfSize:17]]; // 20
                 strongSelf.cardImageHeight.constant = 113; //130;
                 strongSelf.cardBottomDistance.constant = 14; //16;
                 strongSelf.numeroCartaLabelHeight.constant = 17; //20;

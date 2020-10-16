@@ -28,8 +28,9 @@
 #include "../Cryptopp/asn.h"
 #include "../Util/CryptoppUtils.h"
 
-#define ROLE_USER 1
-#define ROLE_ADMIN 2
+#define ROLE_USER                   1
+#define ROLE_ADMIN                  2
+#define CARD_ALREADY_ENABLED        0x000000F0;
 
 OID OID_SURNAME = ((OID(2) += 5) += 4) += 4;
 
@@ -250,6 +251,8 @@ CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts,
             
             ByteArray atrBa((BYTE*)ATR, atrLen);
             
+            progressCallBack(10, "Verifica carta esistente");
+            
             IAS ias((CToken::TokenTransmitCallback)TokenTransmitCallback, atrBa);
             ias.SetCardContext(&conn);
             
@@ -258,9 +261,7 @@ CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts,
             ias.token.Reset();
             ias.SelectAID_IAS();
             ias.ReadPAN();
-        
-            progressCallBack(10, "Lettura dati dalla CIE");
-            
+                    
             ByteDynArray IntAuth;
             ias.SelectAID_CIE();
             ias.ReadDappPubKey(IntAuth);
@@ -269,7 +270,14 @@ CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts,
             
             ByteDynArray IdServizi;
             ias.ReadIdServizi(IdServizi);
-        
+            
+            if (ias.IsEnrolled())
+            {
+                return CARD_ALREADY_ENABLED;
+            }
+
+            progressCallBack(10, "Lettura dati dalla CIE");
+
             ByteArray serviziData(IdServizi.left(12));
 
             ByteDynArray SOD;

@@ -215,7 +215,7 @@
     
     lastInsertedRadioButton = nil;
 
-    if ([cards count] > 1){
+    if ([cards count] > 0){
 
         for(int i = 0; i < [cards count]; i++){
             NSButton *radioButton = [self buildRadioButtonWithIndex:i];

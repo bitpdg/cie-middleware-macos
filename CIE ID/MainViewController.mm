@@ -22,6 +22,7 @@
 #include "../cie-pkcs11/CSP/AbilitaCIE.h"
 #include "../cie-pkcs11/CSP/PINManager.h"
 
+#define CARD_ALREADY_ENABLED        0x000000F0
 
 using namespace std;
 
@@ -413,9 +414,6 @@ CK_RV completedCallback(string& PAN,
         [self showMessage: @"Il PIN deve essere composto da 8 numeri" withTitle:@"PIN non corretto" exitAfter:false];
         return;
     }
-
-    //TODO: aggiungere verifica isCieEnrolled
-    
     
        isCIEEnrolledfn pfnisCieEnrolled = (isCIEEnrolledfn)dlsym(hModule, "isCIEEnrolled");
 
@@ -426,22 +424,10 @@ CK_RV completedCallback(string& PAN,
            
            return;
        }
-    
-        char serial_number[32]={0};
+
         
         [self showHomeSecondPage];
-        
-        pfnisCieEnrolled(serial_number, &progressCallback);
-        
-        NSDictionary *cieDict = [cieList getDictionary];
-        
-        if(cieDict[[NSString stringWithUTF8String:serial_number]])
-        {
-            [self showMessage: @"CIE già abilitata" withTitle:@"CIE già abilitata" exitAfter:NO];
-            [self showHomeFirstPage];
-            return;
-        }
-  
+          
     [((NSControl*)sender) setEnabled:NO];
     
     dispatch_async(dispatch_get_global_queue(0,0), ^{
@@ -505,15 +491,21 @@ CK_RV completedCallback(string& PAN,
                     [self showMessage:@"Errore inaspettato durante la comunicazione con la smart card" withTitle:@"Errore inaspettato" exitAfter:false];
                     [self showHomeFirstPage];
                     break;
+                case CARD_ALREADY_ENABLED:
+                    
+                    [self showMessage: @"CIE già abilitata" withTitle:@"CIE già abilitata" exitAfter:NO];
+                    [self showHomeFirstPage];
+                    
+                    break;
                     
                 case CKR_OK:
                     [self showMessage:@"L'abilitazione della CIE è avvennuta con successo. Allontanare la card dal lettore" withTitle:@"CIE Abilitata" exitAfter:NO];
 
-                    NSString *PAN = [[NSString alloc] initWithCString:sPAN.c_str() encoding:NSMacOSRomanStringEncoding];
+                    NSString *PAN = [[NSString alloc] initWithCString:sPAN.c_str() encoding:NSUTF8StringEncoding];
                     
-                    NSString *serialNumber = [[NSString alloc] initWithCString:sEfSeriale.c_str() encoding:NSMacOSRomanStringEncoding];
+                    NSString *serialNumber = [[NSString alloc] initWithCString:sEfSeriale.c_str() encoding:NSUTF8StringEncoding];
                     
-                    NSString *name = [[NSString alloc] initWithCString:sName.c_str() encoding:NSMacOSRomanStringEncoding];
+                    NSString *name = [[NSString alloc] initWithCString:sName.c_str() encoding:NSUTF8StringEncoding];
 
                     Cie *cie = [[Cie alloc] init:name serial:serialNumber pan:PAN];
                     [cieList addCie:PAN owner:cie];
@@ -926,6 +918,8 @@ CK_RV completedCallback(string& PAN,
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
+        [self updateAbbinaAndAnnullaLayout];
+        
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -948,24 +942,43 @@ CK_RV completedCallback(string& PAN,
             
         }
         
+        if([NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
+        {
+            NSString* name = [NSUserDefaults.standardUserDefaults stringForKey:@"cardholder"];
+            NSString* PAN = [NSUserDefaults.standardUserDefaults stringForKey:@"serialnumber"];
+            NSString* serialNumber = [NSUserDefaults.standardUserDefaults stringForKey:@"efSeriale"];
+            
+            Cie *cie = [[Cie alloc] init:name serial:serialNumber pan:PAN];
+            
+            [cieList addCie:PAN owner:cie];
+            
+            [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
+            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"cardholder"];
+            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"serialnumber"];
+            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"efSeriale"];
+            
+            [NSUserDefaults.standardUserDefaults synchronize];
+            
+        }
+        
         [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
 
         if ([[cieList getDictionary] count] > 0){
             [self showHomeFourthPage];
         }
+        /*
         else if((![NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"]) and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
         {
             [self askRiabbina:@"E' necessario effettuare un nuovo abbinamento. Procedere?" withTitle:@"Abbinare nuovamente la CIE"];
             
-        }else if([NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"] and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
+        }
+        else if([NSUserDefaults.standardUserDefaults objectForKey:@"efSeriale"] and [NSUserDefaults.standardUserDefaults objectForKey:@"cardholder"])
         {
             [self showHomeFourthPage];
         }
+         */
         else
         {
-            
-            //    if(self.homeFirstPageView.hidden)
-            //    {
             self.homeFirstPageView.hidden = NO;
             self.homeSecondPageView.hidden = YES;
             self.homeThirdPageView.hidden = YES;
@@ -1270,8 +1283,8 @@ CK_RV completedCallback(string& PAN,
     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle:@"SI"];
-        [alert addButtonWithTitle:@"No"];
+        [alert addButtonWithTitle:@"Ok"];
+        [alert addButtonWithTitle:@"Annulla"];
         [alert setMessageText:title];
         [alert setInformativeText:message];
 
@@ -1364,7 +1377,7 @@ CK_RV completedCallback(string& PAN,
 
 - (void)shouldRemoveCard:(nonnull Cie *)card {
     removingCie = card;
-    [self askRemove:[NSString stringWithFormat:@"Vuoi rimuovere la CIE %@?", [card getSerialNumber]] withTitle:@"Rimozione CIE"];
+    [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
 }
 
 @end
