@@ -64,7 +64,6 @@ extern "C" {
     CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts, PROGRESS_CALLBACK progressCallBack, COMPLETED_CALLBACK completedCallBack);
     CK_RV CK_ENTRY VerificaCIEAbilitata(const char*  szPAN);
     CK_RV CK_ENTRY DisabilitaCIE(const char*  szPAN);
-    CK_RV CK_ENTRY isCIEEnrolled(char* seriale, PROGRESS_CALLBACK progressCallBack);
 }
 
 CK_RV CK_ENTRY VerificaCIEAbilitata(const char*  szPAN)
@@ -104,91 +103,6 @@ CK_RV CK_ENTRY DisabilitaCIE(const char*  szPAN)
     }
     return CKR_TOKEN_NOT_PRESENT;
 }
-
-CK_RV CK_ENTRY isCIEEnrolled(char* seriale, PROGRESS_CALLBACK progressCallBack)
-{
-    char* readers = NULL;
-    char* ATR = NULL;
-    try
-    {
-        DWORD len = 0;
-        ByteDynArray CertCIE;
-        ByteDynArray SOD;
-
-        SCARDCONTEXT hSC;
-
-        long nRet = SCardEstablishContext(SCARD_SCOPE_USER, nullptr, nullptr, &hSC);
-        if (nRet != SCARD_S_SUCCESS)
-            return CKR_DEVICE_ERROR;
-
-        if (SCardListReaders(hSC, nullptr, NULL, &len) != SCARD_S_SUCCESS) {
-            return CKR_TOKEN_NOT_PRESENT;
-        }
-
-        if (len == 1)
-            return CKR_TOKEN_NOT_PRESENT;
-
-        readers = (char*)malloc(len);
-
-        if (SCardListReaders(hSC, nullptr, (char*)readers, &len) != SCARD_S_SUCCESS) {
-            free(readers);
-            return CKR_TOKEN_NOT_PRESENT;
-        }
-
-        char *curreader = readers;
-        bool foundCIE = false;
-        for (; curreader[0] != 0; curreader += strnlen(curreader, len) + 1)
-        {
-            safeConnection conn(hSC, curreader, SCARD_SHARE_SHARED);
-            if (!conn.hCard)
-                continue;
-
-            DWORD atrLen = 40;
-            if (SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
-                free(readers);
-                return CKR_DEVICE_ERROR;
-            }
-
-            ATR = (char*)malloc(atrLen);
-
-            if (SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
-                free(readers);
-                free(ATR);
-                return CKR_DEVICE_ERROR;
-            }
-
-            progressCallBack(1, "Verifica CIE abilitata");
-            
-            ByteArray atrBa((BYTE*)ATR, atrLen);
-
-            IAS ias((CToken::TokenTransmitCallback)TokenTransmitCallback, atrBa);
-            ias.SetCardContext(&conn);
-
-            foundCIE = false;
-
-            ias.token.Reset();
-            ias.SelectAID_IAS();
-            ias.ReadPAN();
-
-            ias.SelectAID_CIE();
-
-            ByteDynArray IdServizi;
-            ias.ReadIdServizi(IdServizi);
-            memcpy(seriale, IdServizi.data(), IdServizi.size());
-            *(seriale + IdServizi.size()) = '\0';
-        }
-        return SCARD_S_SUCCESS;
-    }
-    catch (std::exception &ex) {
-        OutputDebugString(ex.what());
-        if (ATR)
-            free(ATR);
-        if (readers)
-            free(readers);
-        return CKR_GENERAL_ERROR;
-    }
-}
-
 
 CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts, PROGRESS_CALLBACK progressCallBack, COMPLETED_CALLBACK completedCallBack)
 {
@@ -276,7 +190,7 @@ CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts,
                 return CARD_ALREADY_ENABLED;
             }
 
-            progressCallBack(10, "Lettura dati dalla CIE");
+            progressCallBack(15, "Lettura dati dalla CIE");
 
             ByteArray serviziData(IdServizi.left(12));
 

@@ -62,7 +62,7 @@ void* hModule;
 {
     [super viewDidLoad];
     
-    const char* szCryptoki = "/Users/piero/Library/Developer/Xcode/DerivedData/cie-pkcs11-fjkzxzwrcrivujcoivwzmdntbtzt/Build/Products/Debug/libcie-pkcs11.dylib";
+    const char* szCryptoki = "libcie-pkcs11.dylib";
     
     hModule = dlopen(szCryptoki, RTLD_LAZY);
     if(!hModule)
