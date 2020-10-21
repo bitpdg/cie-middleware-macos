@@ -415,18 +415,8 @@ CK_RV completedCallback(string& PAN,
         return;
     }
     
-       isCIEEnrolledfn pfnisCieEnrolled = (isCIEEnrolledfn)dlsym(hModule, "isCIEEnrolled");
-
-       if(!pfnisCieEnrolled)
-       {
-           dlclose(hModule);
-           [self showMessage: @"Funzione isCieEnrolled non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
-           
-           return;
-       }
-
         
-        [self showHomeSecondPage];
+    [self showHomeSecondPage];
           
     [((NSControl*)sender) setEnabled:NO];
     
@@ -1275,7 +1265,9 @@ CK_RV completedCallback(string& PAN,
 - (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(bool*)contextInfo
 {
     if(*contextInfo)
-        exit(0);
+    {
+       NSLog(@"alert did end with status %ld", (long)returnCode);
+    }
 }
 
 - (void) askRemove: (NSString*) message withTitle: (NSString*) title
