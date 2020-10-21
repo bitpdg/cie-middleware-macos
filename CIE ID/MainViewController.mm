@@ -36,6 +36,7 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
 
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaInvisible;
+@property (weak) IBOutlet NSView *mainCustomView;
 
 @end
 
@@ -61,6 +62,19 @@ void* hModule;
 - (void) viewDidLoad
 {
     [super viewDidLoad];
+
+    [self addSubviewToMainCustomView:_homeFirstPageView];
+    [self addSubviewToMainCustomView:_homeSecondPageView];
+    [self addSubviewToMainCustomView:_homeThirdPageView];
+    [self addSubviewToMainCustomView:_homeFourthPageView];
+    [self addSubviewToMainCustomView:_cambioPINPageView];
+    [self addSubviewToMainCustomView:_cambioPINOKPageView];
+    [self addSubviewToMainCustomView:_sbloccoPageView];
+    [self addSubviewToMainCustomView:_sbloccoOKPageView];
+    [self addSubviewToMainCustomView:_helpPageView];
+    [self addSubviewToMainCustomView:_infoPageView];
+    
+    [self updateViewConstraints];
     
     const char* szCryptoki = "libcie-pkcs11.dylib";
     
@@ -83,6 +97,17 @@ void* hModule;
     progressIndicatorPointerSbloccoPIN = _progressIndicatorSbloccoPIN;
     
     self.carouselView.delegate = self;
+}
+
+- (void) addSubviewToMainCustomView:(NSView *)view {
+    [view setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.mainCustomView addSubview:view];
+    
+    [self.mainCustomView addConstraint:[NSLayoutConstraint constraintWithItem:self.mainCustomView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTop multiplier:1 constant:0]];
+    [self.mainCustomView addConstraint:[NSLayoutConstraint constraintWithItem:self.mainCustomView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeBottom multiplier:1 constant:0]];
+    [self.mainCustomView addConstraint:[NSLayoutConstraint constraintWithItem:self.mainCustomView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTrailing multiplier:1 constant:0]];
+    [self.mainCustomView addConstraint:[NSLayoutConstraint constraintWithItem:self.mainCustomView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeLeading multiplier:1 constant:0]];
+    
 }
 
 - (void) viewDidAppear
