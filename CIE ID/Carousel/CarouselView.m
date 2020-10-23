@@ -106,10 +106,14 @@
             [strongSelf.multipleCardContainerView setHidden:NO];
             [strongSelf.backButton setHidden:NO];
             [strongSelf.nextButton setHidden:NO];
+
             [strongSelf.rightCard setHidden:NO];
             [strongSelf.leftCard setHidden:[cardList count] == 2];
-            [strongSelf.backButton setHidden:[cardList count] < 2];
-            [strongSelf.nextButton setHidden:[cardList count] == 2];
+            [strongSelf.backButton setEnabled:[cardList count] < 2];
+            [strongSelf.nextButton setEnabled:[cardList count] == 2];
+            
+            [strongSelf.backButton setEnabled:[cardList count] >= 3];
+            [strongSelf.nextButton setEnabled:[cardList count] >= 3];
         });
     }
     else if ([cardList count] == 1) {
@@ -133,7 +137,7 @@
     if ([cardList count] > 0) {
         [self updateCards];
     }
-
+    
 }
 
 - (Cie *) getSelectedCard {
@@ -170,6 +174,8 @@
 }
 
 - (IBAction)backPressed:(id)sender {
+
+    
     index--;
     
     if (index < 0) {
@@ -179,19 +185,18 @@
     [self updateCards];
     
     [self updateRadioButtonAppearance];
-
 }
 
 - (IBAction)nextPressed:(id)sender {
     index++;
-    
-    if (index > ([cards count] - 1)) {
-        index = 0;
-    }
-    
-    [self updateCards];
-    
-    [self updateRadioButtonAppearance];
+     
+     if (index > ([cards count] - 1)) {
+         index = 0;
+     }
+     
+     [self updateCards];
+     
+     [self updateRadioButtonAppearance];
 }
 
 #pragma mark - Private methods
@@ -325,14 +330,15 @@
             if (strongSelf->index == 0) {
                 [strongSelf.rightCard setHidden:NO];
                 [strongSelf.leftCard setHidden:YES];
-                [strongSelf.backButton setHidden:NO];
-                [strongSelf.nextButton setHidden:YES];
+                [strongSelf.backButton setEnabled:NO];
+                [strongSelf.nextButton setEnabled:YES ];
             }
             else {
                 [strongSelf.rightCard setHidden:YES];
                 [strongSelf.leftCard setHidden:NO];
-                [strongSelf.backButton setHidden:YES];
-                [strongSelf.nextButton setHidden:NO];
+                //[strongSelf.backButton setHidden:YES];
+                [strongSelf.backButton setEnabled:YES];
+                [strongSelf.nextButton setEnabled:NO];
             }
         }
     });

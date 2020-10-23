@@ -1086,6 +1086,7 @@ CK_RV completedCallback(string& PAN,
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
         self.sbloccoPageView.hidden = YES;
+        self.sbloccoOKPageView.hidden = YES;
     });
 }
 
