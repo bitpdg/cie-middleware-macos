@@ -12,6 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface MainViewController : NSViewController <NSWindowDelegate>
 
 @property IBOutlet NSView* homeFirstPageView;
@@ -24,6 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* sbloccoOKPageView;
 @property IBOutlet NSView* helpPageView;
 @property IBOutlet NSView* infoPageView;
+@property IBOutlet NSView* selectFilePageView;
+@property IBOutlet NSView* selectOperationView;
+@property IBOutlet NSView* firmaOperationView;
+@property IBOutlet NSView* firmaPrevView;
+
+
 @property IBOutlet NSTextField* labelHelp;
 @property IBOutlet WKWebView* helpWebView;
 @property IBOutlet WKWebView* infoWebView;
@@ -57,8 +64,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* tutorialButtonView;
 @property IBOutlet NSView* helpButtonView;
 @property IBOutlet NSView* infoButtonView;
+@property IBOutlet NSView* firmaElettronicaButtonView;
+
 
 @property (weak) IBOutlet CarouselView *carouselView;
+
 
 @end
 

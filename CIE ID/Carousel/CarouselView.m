@@ -28,6 +28,7 @@
 @property (weak) IBOutlet CarouselCard *leftCard;
 @property (weak) IBOutlet CarouselCard *rightCard;
 @property (weak) IBOutlet CarouselCard *mainCard;
+@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 
 @property (weak) IBOutlet NSView *radioButtonsContainer;
 
@@ -57,6 +58,8 @@
     [_rightCard setupWithSizeMode:CarouselCardSizeModeSmall];
     [_mainCard setupWithSizeMode:CarouselCardSizeModeRegular];
     //[_mainCard setNameLabelOnOneLine];
+    
+    [_progressIndicator startAnimation:nil];
     
     [_leftCard setAlphaValue:0.5];
     [_rightCard setAlphaValue:0.5];
@@ -326,6 +329,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(weakSelf) strongSelf = weakSelf;
 
+        [strongSelf.mainCard setHidden:NO];
+
         if ([strongSelf->cards count] == 2) {
             if (strongSelf->index == 0) {
                 [strongSelf.rightCard setHidden:NO];
@@ -341,6 +346,8 @@
                 [strongSelf.nextButton setEnabled:NO];
             }
         }
+        
+        [strongSelf.progressIndicator setHidden:YES];
     });
 }
 

@@ -13,6 +13,8 @@
 #import "PINNoticeViewController.h"
 #import "CieList.h"
 #import "Cie.h"
+#import "ChangeView.h"
+#import "CIE_ID-Swift.h"
 
 #include <memory.h>
 #include <time.h>
@@ -33,12 +35,34 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
     Cie *removingCie;
 }
 
+@property (weak) IBOutlet NSTextField *lblCades;
+@property (weak) IBOutlet NSTextField *lblCadesSub;
+@property (weak) IBOutlet NSImageView *pictureCades;
+@property (weak) IBOutlet NSTextField *lblPades;
+@property (weak) IBOutlet NSTextField *lblPadesSub;
+@property (weak) IBOutlet NSImageView *picturePades;
+@property (weak) IBOutlet NSTextField *filePathSignOp;
+@property (weak) IBOutlet NSButton *cbFirmaGrafica;
+@property (weak) IBOutlet NSView *viewFirmaSelectOp;
+@property (weak) IBOutlet NSView *prevImageView;
+@property (weak) IBOutlet NSTextField* lblPathFirmaPrev;
+
+
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
 
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaInvisible;
 @property (weak) IBOutlet NSView *mainCustomView;
 
+typedef NS_ENUM(NSUInteger, signOp) {
+    NO_OP,
+    FIRMA_CADES,
+    FIRMA_PADES
+};
+
+
 @end
+
+
 
 @implementation MainViewController
 
@@ -55,14 +79,35 @@ string sPAN;
 string sName;
 string sEfSeriale;
 
+NSString* filePath;
+NSString *path;
+NSArray *viewArray;
+
+signOp operation;
+PdfPreview* pdfPreview;
+
 CieList *cieList;
 
 void* hModule;
+
+- (void)loadView {
+    [super loadView];
+    
+    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, nil];
+    
+    ChangeView *cG = [ChangeView getInstance];
+    cG.viewArray = viewArray;
+    
+    [self showHomeFirstPage];
+    
+}
 
 - (void) viewDidLoad
 {
     [super viewDidLoad];
 
+    [_viewFirmaSelectOp updateLayer];
+    
     [self addSubviewToMainCustomView:_homeFirstPageView];
     [self addSubviewToMainCustomView:_homeSecondPageView];
     [self addSubviewToMainCustomView:_homeThirdPageView];
@@ -73,6 +118,34 @@ void* hModule;
     [self addSubviewToMainCustomView:_sbloccoOKPageView];
     [self addSubviewToMainCustomView:_helpPageView];
     [self addSubviewToMainCustomView:_infoPageView];
+    [self addSubviewToMainCustomView:_selectFilePageView];
+    [self addSubviewToMainCustomView:_selectOperationView];
+    [self addSubviewToMainCustomView:_firmaOperationView];
+    [self addSubviewToMainCustomView:_firmaPrevView]; // verificare
+    
+    operation = NO_OP;
+    
+    if(([NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
+    {
+
+        NSData *cieData = [NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"];
+        
+        CieList *test = [[CieList alloc] init:cieData];
+        NSDictionary *cieDict = [test getDictionary];
+        
+        if (cieDict.count > 0) {
+            [_homeFourthPageView setHidden:NO];
+        }
+        else {
+            [_homeFirstPageView setHidden:NO];
+        }
+        
+    }else
+    {
+        [_homeFirstPageView setHidden:NO];
+        
+    }
+    
     
     [self updateViewConstraints];
     
@@ -97,6 +170,19 @@ void* hModule;
     progressIndicatorPointerSbloccoPIN = _progressIndicatorSbloccoPIN;
     
     self.carouselView.delegate = self;
+}
+
+- (void)viewDidLayout {
+    [super viewDidLayout];
+    
+    _viewFirmaSelectOp.layer.cornerRadius = 8.0;
+    _viewFirmaSelectOp.layer.borderColor = NSColor.grayColor.CGColor;
+    _viewFirmaSelectOp.layer.borderWidth = 8.0;
+    _viewFirmaSelectOp.layer.backgroundColor = NSColor.blackColor.CGColor;
+//    _viewFirmaSelectOp.layer.masksToBounds = false;
+    
+//    [_viewFirmaSelectOp updateLayer];
+    
 }
 
 - (void) addSubviewToMainCustomView:(NSView *)view {
@@ -278,6 +364,7 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)onAggiungiCie:(id)sender {
     
+    /*
     self.homeFirstPageView.hidden = NO;
     self.homeSecondPageView.hidden = YES;
     self.homeThirdPageView.hidden = YES;
@@ -288,6 +375,11 @@ CK_RV completedCallback(string& PAN,
     self.sbloccoOKPageView.hidden = YES;
     self.helpPageView.hidden = YES;
     self.infoPageView.hidden = YES;
+    */
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:HOME_FIRST_PAGE];
+    
     
     for(int i = 1; i < 9; i++)
     {
@@ -377,6 +469,11 @@ CK_RV completedCallback(string& PAN,
 {
     [self showHomeFirstPage];
 }
+
+- (IBAction)firmaElettronica:(id)sender {
+    [self showFirmaElettronica];
+}
+
 
 - (IBAction)cambioPIN:(id)sender
 {
@@ -901,6 +998,7 @@ CK_RV completedCallback(string& PAN,
 {
     if(returnCode == NSAlertFirstButtonReturn)
     {
+        /*
             self.homeFirstPageView.hidden = NO;
             self.homeSecondPageView.hidden = YES;
             self.homeThirdPageView.hidden = YES;
@@ -911,6 +1009,10 @@ CK_RV completedCallback(string& PAN,
             self.sbloccoOKPageView.hidden = YES;
             self.helpPageView.hidden = YES;
             self.infoPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HOME_FIRST_PAGE];
             
             for(int i = 1; i < 9; i++)
             {
@@ -927,6 +1029,40 @@ CK_RV completedCallback(string& PAN,
     }
 }
 
+-(void) showFirmaElettronica
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [self updateAbbinaAndAnnullaLayout];
+        
+        self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        
+        /*
+        self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = NO;
+        self.homeSecondPageView.hidden = YES;
+        self.homeThirdPageView.hidden = YES;
+        self.homeFourthPageView.hidden = YES;
+        self.cambioPINPageView.hidden = YES;
+        self.cambioPINOKPageView.hidden = YES;
+        self.sbloccoPageView.hidden = YES;
+        self.sbloccoOKPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:SELECT_FILE_PAGE];
+        
+        
+    });
+    
+}
+
 - (void) showHomeFirstPage
 {
     //[NSUserDefaults.standardUserDefaults removeObjectForKey:@"cieDictionary"];
@@ -936,6 +1072,7 @@ CK_RV completedCallback(string& PAN,
         [self updateAbbinaAndAnnullaLayout];
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -994,6 +1131,7 @@ CK_RV completedCallback(string& PAN,
          */
         else
         {
+            /*
             self.homeFirstPageView.hidden = NO;
             self.homeSecondPageView.hidden = YES;
             self.homeThirdPageView.hidden = YES;
@@ -1002,6 +1140,10 @@ CK_RV completedCallback(string& PAN,
             self.cambioPINOKPageView.hidden = YES;
             self.sbloccoPageView.hidden = YES;
             self.sbloccoOKPageView.hidden = YES;
+            */
+            
+            ChangeView *cG = [ChangeView getInstance];
+            [cG showSubView:HOME_FIRST_PAGE];
             
             for(int i = 1; i < 9; i++)
             {
@@ -1021,20 +1163,30 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
+        /*
         self.homeFirstPageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeThirdPageView.hidden = NO;
         self.homeFourthPageView.hidden = YES;
         self.cambioPINPageView.hidden = YES;
         self.cambioPINOKPageView.hidden = YES;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HOME_THIRD_PAGE];
+         
+        
+        //[self showSubView:HOME_THIRD_PAGE];
     });
 }
 
@@ -1043,6 +1195,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -1051,6 +1204,7 @@ CK_RV completedCallback(string& PAN,
         
         
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = NO;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1058,6 +1212,10 @@ CK_RV completedCallback(string& PAN,
         self.cambioPINOKPageView.hidden = YES;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HOME_SECOND_PAGE];
+         
     });
 }
 
@@ -1069,6 +1227,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -1077,7 +1236,9 @@ CK_RV completedCallback(string& PAN,
         
         [self updateAbbinaAndAnnullaLayout];
 
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = NO;
@@ -1087,6 +1248,11 @@ CK_RV completedCallback(string& PAN,
         self.infoPageView.hidden = YES;
         self.sbloccoPageView.hidden = YES;
         self.sbloccoOKPageView.hidden = YES;
+        */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HOME_FOURTH_PAGE];
+         
     });
 }
 
@@ -1095,6 +1261,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -1104,7 +1271,9 @@ CK_RV completedCallback(string& PAN,
         self.progressIndicatorCambioPIN.hidden = YES;
         self.labelProgressCambioPIN.hidden = YES;
         
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1114,6 +1283,10 @@ CK_RV completedCallback(string& PAN,
         self.sbloccoOKPageView.hidden = YES;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+         */
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:CAMBIO_PIN_PAGE];
+         
     });
 }
 
@@ -1122,14 +1295,16 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
-        
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1137,6 +1312,9 @@ CK_RV completedCallback(string& PAN,
         self.cambioPINOKPageView.hidden = NO;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+         */
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:CAMBIO_PIN_OK_PAGE];
     });
 }
 
@@ -1145,6 +1323,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -1154,7 +1333,9 @@ CK_RV completedCallback(string& PAN,
         self.progressIndicatorSbloccoPIN.hidden = YES;
         self.labelProgressSbloccoPIN.hidden = YES;
         
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1164,6 +1345,11 @@ CK_RV completedCallback(string& PAN,
         self.sbloccoOKPageView.hidden = YES;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:SBLOCCO_PAGE];
+        
     });
 }
 
@@ -1172,13 +1358,16 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1188,6 +1377,11 @@ CK_RV completedCallback(string& PAN,
         self.sbloccoOKPageView.hidden = NO;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:SBLOCCO_OK_PAGE];
+        
     });
 }
 
@@ -1196,6 +1390,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -1207,7 +1402,9 @@ CK_RV completedCallback(string& PAN,
         self.assistenzaImageView.hidden = NO;
         self.sbloccoImageView.hidden = NO;
         
+        /*
         self.homeFirstPageView.hidden = YES;
+        self.selectFilePageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
         self.homeFourthPageView.hidden = YES;
@@ -1215,6 +1412,10 @@ CK_RV completedCallback(string& PAN,
         self.cambioPINOKPageView.hidden = YES;
         self.helpPageView.hidden = NO;
         self.infoPageView.hidden = YES;
+         */
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HELP_PAGE];
+
         
         [self.helpWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://idserver.servizicie.interno.gov.it/idp/aiuto.jsp"]]];
     });
@@ -1225,6 +1426,7 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
@@ -1235,6 +1437,7 @@ CK_RV completedCallback(string& PAN,
         self.assistenzaImageView.hidden = YES;
         self.sbloccoImageView.hidden = YES;
         
+        /*
         self.homeFirstPageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
@@ -1243,6 +1446,10 @@ CK_RV completedCallback(string& PAN,
         self.cambioPINOKPageView.hidden = YES;
         self.helpPageView.hidden = NO;
         self.infoPageView.hidden = YES;
+         */
+        
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:HELP_PAGE];
         
         [self.helpWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://idserver.servizicie.interno.gov.it/idp/tutorial_mac.jsp"]]];
     });
@@ -1253,12 +1460,14 @@ CK_RV completedCallback(string& PAN,
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         
+        /*
         self.homeFirstPageView.hidden = YES;
         self.homeSecondPageView.hidden = YES;
         self.homeThirdPageView.hidden = YES;
@@ -1267,6 +1476,9 @@ CK_RV completedCallback(string& PAN,
         self.cambioPINOKPageView.hidden = YES;
         self.helpPageView.hidden = YES;
         self.infoPageView.hidden = NO;
+         */
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:INFO_PAGE];
         
         [self.infoWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://idserver.servizicie.interno.gov.it/idp/privacy.jsp"]]];
     });
@@ -1368,6 +1580,7 @@ CK_RV completedCallback(string& PAN,
 #pragma mark - CarouselViewDelegate
 
 - (void)shouldAddCard {
+    /*
     self.homeFirstPageView.hidden = NO;
     self.homeSecondPageView.hidden = YES;
     self.homeThirdPageView.hidden = YES;
@@ -1378,6 +1591,10 @@ CK_RV completedCallback(string& PAN,
     self.sbloccoOKPageView.hidden = YES;
     self.helpPageView.hidden = YES;
     self.infoPageView.hidden = YES;
+     */
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:HOME_FIRST_PAGE];
+     
     
     for(int i = 1; i < 9; i++)
     {
@@ -1397,6 +1614,113 @@ CK_RV completedCallback(string& PAN,
 - (void)shouldRemoveCard:(nonnull Cie *)card {
     removingCie = card;
     [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
+}
+
+
+- (IBAction)selectDocument:(id)sender {
+    
+    NSOpenPanel *panel = [[NSOpenPanel alloc] init];
+    
+    
+    if ([panel runModal] == NSModalResponseOK)
+    {
+        NSArray* selectedFile = [panel URLs];
+        NSURL *url = (NSURL *)selectedFile[0];
+        path = [url path];
+        filePath = path;
+        
+        NSLog(@"%@ was selected", selectedFile[0]);
+        
+        ChangeView *cG = [ChangeView getInstance];
+        NSView* cV = [cG getView:SELECT_OP_PAGE];
+                
+        NSTextField* lblPath = [cV viewWithTag:1];
+        lblPath.stringValue = path;
+        
+        [cG showSubView:SELECT_OP_PAGE];
+        
+    }
+}
+- (IBAction)btnFirmaOp:(id)sender {
+    NSLog(@"Selected Firma Operation");
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_FIRMA_OP];
+    
+    _filePathSignOp.stringValue = [filePath stringByReplacingOccurrencesOfString:@"/" withString:@" ▶︎ "];
+    
+}
+
+- (IBAction)btnVerificaOp:(id)sender {
+    NSLog(@"Selected Verifica Operation");
+    
+}
+
+- (IBAction)btnAnnullaOp:(id)sender {
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_FILE_PAGE];
+    
+}
+
+
+- (IBAction)CadesClick:(id)sender {
+    
+    _lblCades.textColor = NSColor.blackColor;
+    _lblCadesSub.textColor = NSColor.blackColor;
+    _lblPades.textColor = NSColor.grayColor;
+    _lblPadesSub.textColor = NSColor.grayColor;
+    
+    operation  = FIRMA_CADES;
+    _cbFirmaGrafica.state = NSOffState;
+    //TODO mettere immagine colorata
+}
+
+- (IBAction)PadesClick:(id)sender {
+    
+    _lblCades.textColor = NSColor.grayColor;
+    _lblCadesSub.textColor = NSColor.grayColor;
+    
+    _lblPades.textColor = NSColor.blackColor;
+    _lblPadesSub.textColor = NSColor.blackColor;
+    
+    operation  = FIRMA_PADES;
+    //TODO mettere immagine colorata
+    
+}
+- (IBAction)cbFirmaGraficaClick:(id)sender {
+    [self PadesClick:0];
+}
+
+- (IBAction)btnProseguiFirmaOp:(id)sender {
+    
+    ChangeView *cG = [ChangeView getInstance];
+    NSView* cV = [cG getView:SELECT_OP_PAGE];
+    NSTextField* lblPath = [cV viewWithTag:1];
+    NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
+    
+    for (NSView *aSubview in [[self prevImageView] subviews]) {
+        [aSubview removeFromSuperview];
+    }
+    
+    pdfPreview = [[PdfPreview alloc] initWithPrImageView:[self prevImageView] pdfPath:lblPath.stringValue signImagePath:signImgPath];
+    
+    _lblPathFirmaPrev.stringValue = path ;
+    
+    [cG showSubView:FIRMA_PDF_PREVIEW];
+    
+}
+
+- (IBAction)btnAnnullaFirmaOp:(id)sender {
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_OP_PAGE];
+}
+
+- (IBAction)pdfPageUp:(id)sender {
+    [pdfPreview pageUp];
+}
+
+- (IBAction)pdfPageDown:(id)sender {
+    [pdfPreview pageDown];
 }
 
 @end

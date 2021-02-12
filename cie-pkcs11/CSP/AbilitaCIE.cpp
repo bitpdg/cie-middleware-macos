@@ -27,6 +27,8 @@
 #include "../Cryptopp/cryptlib.h"
 #include "../Cryptopp/asn.h"
 #include "../Util/CryptoppUtils.h"
+#include "../Sign/CIESign.h"
+#include "../Sign/CIEVerify.h"
 
 #define ROLE_USER                   1
 #define ROLE_ADMIN                  2
@@ -64,7 +66,143 @@ extern "C" {
     CK_RV CK_ENTRY AbilitaCIE(const char*  szPAN, const char*  szPIN, int* attempts, PROGRESS_CALLBACK progressCallBack, COMPLETED_CALLBACK completedCallBack);
     CK_RV CK_ENTRY VerificaCIEAbilitata(const char*  szPAN);
     CK_RV CK_ENTRY DisabilitaCIE(const char*  szPAN);
+    CK_RV CK_ENTRY verificaConCIE(const char* inFilePath);
+    CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath);
 }
+
+CK_RV CK_ENTRY verificaConCIE(const char* inFilePath)
+{
+
+    VERIFY_RESULT verifyResult;
+
+    CIEVerify* verifier = new CIEVerify();
+
+    verifier->verify(inFilePath, &verifyResult);
+
+    if (verifyResult.nErrorCode == 0)
+    {
+
+        printf("verificaConCIE OK");
+        return CKR_OK;
+    }
+    else
+    {
+        printf("Errore nella verifica: %lu\n", verifyResult.nErrorCode);
+        return verifyResult.nErrorCode;
+    }
+    
+}
+
+CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath)
+{
+
+    printf("page: %d, x: %f, y: %f, w: %f, h: %f", page, x, y, w, h);
+
+    char* readers = NULL;
+    char* ATR = NULL;
+    try
+    {
+        std::map<uint8_t, ByteDynArray> hashSet;
+
+        DWORD len = 0;
+        ByteDynArray CertCIE;
+        ByteDynArray SOD;
+
+        SCARDCONTEXT hSC;
+
+        long nRet = SCardEstablishContext(SCARD_SCOPE_USER, nullptr, nullptr, &hSC);
+        if (nRet != SCARD_S_SUCCESS)
+            return CKR_DEVICE_ERROR;
+
+        OutputDebugString("Establish Context ok\n");
+
+        if (SCardListReaders(hSC, nullptr, NULL, &len) != SCARD_S_SUCCESS) {
+            OutputDebugString("List readers ko\n");
+            return CKR_TOKEN_NOT_PRESENT;
+        }
+
+        if (len == 1)
+            return CKR_TOKEN_NOT_PRESENT;
+
+        readers = (char*)malloc(len);
+
+        if (SCardListReaders(hSC, nullptr, (char*)readers, &len) != SCARD_S_SUCCESS) {
+            free(readers);
+            return CKR_TOKEN_NOT_PRESENT;
+        }
+
+        char *curreader = readers;
+        
+        for (; curreader[0] != 0; curreader += strnlen(curreader, len) + 1)
+        {
+
+            safeConnection conn(hSC, curreader, SCARD_SHARE_SHARED);
+            if (!conn.hCard)
+                continue;
+
+            LONG res = 0;
+
+            res = SCardBeginTransaction(conn.hCard);
+
+            while (res != SCARD_S_SUCCESS)
+            {
+                DWORD protocol = 0;
+                SCardReconnect(conn.hCard, SCARD_SHARE_SHARED, SCARD_PROTOCOL_Tx, SCARD_UNPOWER_CARD, &protocol);
+                OutputDebugString("errore\n");
+                res = SCardBeginTransaction(conn.hCard);
+            }
+
+            DWORD atrLen = 40;
+            res = SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen);
+            if (res != SCARD_S_SUCCESS) {
+                free(readers);
+                OutputDebugString("GetAttrib ko 1, %lu\n", res);
+                return CKR_DEVICE_ERROR;
+            }
+
+
+            ATR = (char*)malloc(atrLen);
+
+            if (SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
+                free(readers);
+                free(ATR);
+                return CKR_DEVICE_ERROR;
+            }
+
+            ByteArray atrBa((BYTE*)ATR, atrLen);
+            IAS* ias = new IAS((CToken::TokenTransmitCallback)TokenTransmitCallback, atrBa);
+            ias->SetCardContext(&conn);
+
+            CIESign* cieSign = new CIESign(ias);
+
+            uint16_t ret = cieSign->sign(inFilePath, type, pin, page, x, y, w, h, imagePathFile, outFilePath);
+            OutputDebugString("CieSign ret: %d", ret);
+
+            free(ias);
+            free(cieSign);
+        }
+    }
+    catch (std::exception &ex) {
+        OutputDebugString(ex.what());
+        if (ATR)
+            free(ATR);
+        OutputDebugString("Eccezione: %s", ex.what());
+        if (readers)
+            free(readers);
+
+        OutputDebugString("General error\n");
+        return CKR_GENERAL_ERROR;
+    }
+
+    if (ATR)
+        free(ATR);
+
+    free(readers);
+
+    return SCARD_S_SUCCESS;
+}
+
+
 
 CK_RV CK_ENTRY VerificaCIEAbilitata(const char*  szPAN)
 {

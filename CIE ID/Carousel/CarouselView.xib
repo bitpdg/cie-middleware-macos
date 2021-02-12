@@ -10,11 +10,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="CarouselView">
             <connections>
+                <outlet property="aaa" destination="bjQ-ib-zXq" id="y0y-il-2nO"/>
                 <outlet property="backButton" destination="RdP-TU-VYs" id="kGR-OV-8b0"/>
                 <outlet property="leftCard" destination="lzB-Wd-sVC" id="UMF-cc-YJF"/>
                 <outlet property="mainCard" destination="pqv-Oe-kK9" id="r5V-4W-dpY"/>
                 <outlet property="multipleCardContainerView" destination="39B-Qm-UbP" id="h7j-by-Ma7"/>
                 <outlet property="nextButton" destination="28e-J6-ZOM" id="sgc-FK-eLE"/>
+                <outlet property="progressIndicator" destination="bjQ-ib-zXq" id="Dzt-w7-OuK"/>
                 <outlet property="radioButtonsContainer" destination="Yba-UV-VB9" id="96H-TK-tfL"/>
                 <outlet property="rightCard" destination="sYR-yE-FuJ" id="gH7-yY-e7P"/>
                 <outlet property="singleCardContainerView" destination="gNV-hh-xTy" id="GyC-E8-V4x"/>
@@ -351,27 +353,30 @@ DQ
                         <constraint firstAttribute="trailing" secondItem="28e-J6-ZOM" secondAttribute="trailing" id="PxD-DW-ssT"/>
                     </constraints>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="lzB-Wd-sVC" userLabel="leftCard" customClass="CarouselCard">
+                <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lzB-Wd-sVC" userLabel="leftCard" customClass="CarouselCard">
                     <rect key="frame" x="48" y="220" width="180" height="234"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="180" id="9ks-YO-E2U"/>
                         <constraint firstAttribute="height" constant="234" id="pll-pp-umI"/>
                     </constraints>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="sYR-yE-FuJ" userLabel="rightCard" customClass="CarouselCard">
+                <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sYR-yE-FuJ" userLabel="rightCard" customClass="CarouselCard">
                     <rect key="frame" x="634" y="220" width="180" height="234"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="234" id="otO-ZH-DQg"/>
                         <constraint firstAttribute="width" constant="180" id="y7c-x3-AoA"/>
                     </constraints>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="pqv-Oe-kK9" customClass="CarouselCard">
+                <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pqv-Oe-kK9" customClass="CarouselCard">
                     <rect key="frame" x="331" y="182" width="200" height="260"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="200" id="1wh-bb-cif"/>
                         <constraint firstAttribute="height" constant="260" id="hZH-oZ-pZJ"/>
                     </constraints>
                 </customView>
+                <progressIndicator maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="bjQ-ib-zXq">
+                    <rect key="frame" x="423" y="304" width="16" height="16"/>
+                </progressIndicator>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="UzY-Ai-OEa">
                     <rect key="frame" x="23" y="62" width="816" height="120"/>
                     <subviews>
@@ -391,6 +396,7 @@ DQ
             </subviews>
             <constraints>
                 <constraint firstItem="gNV-hh-xTy" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="00G-2e-aAm"/>
+                <constraint firstItem="bjQ-ib-zXq" firstAttribute="centerX" secondItem="pqv-Oe-kK9" secondAttribute="centerX" id="3mU-Sv-aei"/>
                 <constraint firstAttribute="trailing" secondItem="XRw-gZ-Xgp" secondAttribute="trailing" constant="8" id="8fr-Ov-zBA"/>
                 <constraint firstItem="TOJ-r2-TWh" firstAttribute="top" secondItem="UzY-Ai-OEa" secondAttribute="bottom" id="A9o-p9-HRS"/>
                 <constraint firstItem="UzY-Ai-OEa" firstAttribute="leading" secondItem="4RL-MR-IBC" secondAttribute="trailing" id="Jt7-T9-PnE"/>
@@ -398,6 +404,7 @@ DQ
                 <constraint firstItem="gNV-hh-xTy" firstAttribute="top" secondItem="TOJ-r2-TWh" secondAttribute="bottom" id="Oo0-pS-7mu"/>
                 <constraint firstItem="4RL-MR-IBC" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="Rbk-l5-BMG"/>
                 <constraint firstAttribute="bottom" secondItem="gNV-hh-xTy" secondAttribute="bottom" id="Rbm-an-F98"/>
+                <constraint firstItem="bjQ-ib-zXq" firstAttribute="centerY" secondItem="pqv-Oe-kK9" secondAttribute="centerY" id="Rmh-sV-p8c"/>
                 <constraint firstItem="4RL-MR-IBC" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="StD-xT-XSS"/>
                 <constraint firstItem="XRw-gZ-Xgp" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="UpL-Wi-S5b"/>
                 <constraint firstAttribute="trailing" secondItem="TOJ-r2-TWh" secondAttribute="trailing" constant="130" id="W9m-aU-NEx"/>
