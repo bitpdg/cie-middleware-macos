@@ -35,13 +35,11 @@ class MovableImageView: NSImageView {
 
     @objc
     override func mouseDown(with event: NSEvent) {
-        Swift.print("mouseDown")
         firstMouseDownPoint = (self.window?.contentView?.convert(event.locationInWindow, to: self))!
     }
         
     @objc
     override func mouseDragged(with event: NSEvent) {
-        Swift.print("mouseDragged")
         let newPoint = (self.window?.contentView?.convert(event.locationInWindow, to: self))!
 
         let offset = NSPoint(x: newPoint.x - firstMouseDownPoint.x, y: newPoint.y - firstMouseDownPoint.y)
@@ -50,7 +48,7 @@ class MovableImageView: NSImageView {
         let size = self.frame.size
         
         
-        Swift.print("x: %d, y: %d", origin.x + offset.x, origin.y + offset.y);
+        //Swift.print("x: %d, y: %d", origin.x + offset.x, origin.y + offset.y);
         var x = origin.x + offset.x;
         var y = origin.y + offset.y;
         

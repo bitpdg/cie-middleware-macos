@@ -53,7 +53,11 @@ class PdfPreview : NSObject
         let signImage = NSImage.init(contentsOfFile: self.signImagePath)
         
         self.signPicture = MovableImageView.init(image: signImage!)
-        self.signPicture.frame = NSMakeRect(0, 0, 120, 20)
+        self.signPicture.frame = NSMakeRect(0, 0, 80, 25)
+        self.signPicture.wantsLayer = true
+        self.signPicture.layer?.borderWidth = 1
+        self.signPicture.layer?.borderColor = NSColor.gray.cgColor
+        
         
         self.iVPdfPreview = NSImageView.init()
         
@@ -72,12 +76,8 @@ class PdfPreview : NSObject
         let newImage = NSImage.init(size: transparentImage.size)
         newImage.lockFocus()
         NSColor.white.set()
-        print("Image size ", transparentImage.size.width, transparentImage.size.height)
         let rc = NSMakeRect(0, 0, newImage.size.width, newImage.size.height)
-        //let rc = NSMakeRect(0, 0, self.iVPdfPreview.frame.width, self.iVPdfPreview.frame.height)
-        
         rc.fill()
-        
         transparentImage.draw(in : rc)
         newImage.unlockFocus()
         
@@ -169,6 +169,32 @@ class PdfPreview : NSObject
         }
         
         self.showPreview()
+    }
+    
+    @objc
+    func getSignImageInfos() -> [Float]
+    {
+        var infos = [Float]()
+        
+        let x = (Float)(signPicture.frame.origin.x / iVPdfPreview.bounds.size.width)
+        let y = 1.0 - ((Float)(signPicture.frame.origin.y / iVPdfPreview.bounds.size.height))
+        let w = (Float)(signPicture.frame.size.width / iVPdfPreview.bounds.size.width)
+        let h = (Float)((signPicture.frame.size.height) / iVPdfPreview.bounds.size.height)
+        
+        print("x: \(x), y: \(y), w: \(w), h: \(h)")
+        
+        infos.append(x)
+        infos.append(y)
+        infos.append(w)
+        infos.append(h)
+        
+        return infos
+    }
+    
+    @objc
+    func getSelectedPage() -> Int
+    {
+        return pageNumber
     }
     
 }

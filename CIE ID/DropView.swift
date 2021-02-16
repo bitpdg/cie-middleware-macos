@@ -85,7 +85,6 @@ class DropView: NSView {
         else { return false }
 
         self.filePath = path
-        Swift.print("FilePath: \(path)")
         
         self.goToSelectOpPage(path: path)
         

@@ -25,6 +25,7 @@
 #include "../cie-pkcs11/CSP/PINManager.h"
 
 #define CARD_ALREADY_ENABLED        0x000000F0
+#define CARD_PAN_MISMATCH           0x000000F1
 
 using namespace std;
 
@@ -46,6 +47,19 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSView *viewFirmaSelectOp;
 @property (weak) IBOutlet NSView *prevImageView;
 @property (weak) IBOutlet NSTextField* lblPathFirmaPrev;
+@property (weak) IBOutlet NSTextField *lblPathFirmaPin;
+@property (weak) IBOutlet NSTextField *lblInsertPin;
+@property (weak) IBOutlet NSProgressIndicator *progressFirma;
+@property (weak) IBOutlet NSTextField *lblProgressFirma;
+@property (weak) IBOutlet NSImageView *imgFirmaOk;
+@property (weak) IBOutlet NSView *cvInsertPin;
+@property (weak) IBOutlet NSButton *btnAnnullaFirma;
+@property (weak) IBOutlet NSButton *btnConcludiFirma;
+@property (weak) IBOutlet NSButton *btnFirma;
+@property (weak) IBOutlet NSButton *btnFirmaElettronica;
+@property (weak) IBOutlet NSTextField *lblPathOp;
+@property (weak) IBOutlet NSButton *btnProseguiFirmaOp;
+@property (weak) IBOutlet NSImageView *signImageView;
 
 
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
@@ -56,7 +70,7 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 typedef NS_ENUM(NSUInteger, signOp) {
     NO_OP,
     FIRMA_CADES,
-    FIRMA_PADES
+    FIRMA_PADES,
 };
 
 
@@ -74,6 +88,18 @@ NSProgressIndicator* progressIndicatorPointerCambioPIN;
 
 NSTextField* labelProgressPointerSbloccoPIN;
 NSProgressIndicator* progressIndicatorPointerSbloccoPIN;
+
+NSProgressIndicator* progressIndicatorPointerFirma;
+NSTextField* lblInsertPinPointer;
+NSTextField* lblProgressFirmaPointer;
+NSView* cvInsertPinPointer;
+NSButton* btnAnnullPointer;
+NSButton* btnAnnullaFirmaPointer;
+NSButton* btnFirmaPointer;
+NSButton* btnConcludiFirmaPointer;
+NSImageView* imgFirmaOkPointer;
+NSButton* cbFirmaGraficaPointer;
+
 
 string sPAN;
 string sName;
@@ -93,7 +119,7 @@ void* hModule;
 - (void)loadView {
     [super loadView];
     
-    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, nil];
+    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, _firmaPinView, _personalizzaFirmaView, nil];
     
     ChangeView *cG = [ChangeView getInstance];
     cG.viewArray = viewArray;
@@ -121,7 +147,9 @@ void* hModule;
     [self addSubviewToMainCustomView:_selectFilePageView];
     [self addSubviewToMainCustomView:_selectOperationView];
     [self addSubviewToMainCustomView:_firmaOperationView];
-    [self addSubviewToMainCustomView:_firmaPrevView]; // verificare
+    [self addSubviewToMainCustomView:_firmaPrevView];
+    [self addSubviewToMainCustomView:_firmaPinView];
+    [self addSubviewToMainCustomView:_personalizzaFirmaView];
     
     operation = NO_OP;
     
@@ -169,16 +197,26 @@ void* hModule;
     labelProgressPointerSbloccoPIN = _labelProgressSbloccoPIN;
     progressIndicatorPointerSbloccoPIN = _progressIndicatorSbloccoPIN;
     
+    progressIndicatorPointerFirma = _progressFirma;
+    lblInsertPinPointer =  _lblInsertPin;
+    lblProgressFirmaPointer = _lblProgressFirma;
+    cvInsertPinPointer = _cvInsertPin;
+    btnAnnullPointer = _btnAnnulla;
+    btnAnnullaFirmaPointer = _btnAnnullaFirma;
+    btnFirmaPointer = _btnFirma;
+    btnConcludiFirmaPointer = _btnConcludiFirma;
+    imgFirmaOkPointer = _imgFirmaOk;
+    cbFirmaGraficaPointer = _cbFirmaGrafica;
+
     self.carouselView.delegate = self;
 }
 
 - (void)viewDidLayout {
     [super viewDidLayout];
     
-    _viewFirmaSelectOp.layer.cornerRadius = 8.0;
-    _viewFirmaSelectOp.layer.borderColor = NSColor.grayColor.CGColor;
-    _viewFirmaSelectOp.layer.borderWidth = 8.0;
-    _viewFirmaSelectOp.layer.backgroundColor = NSColor.blackColor.CGColor;
+    //_viewFirmaSelectOp.layer.cornerRadius = 8.0;
+    //_viewFirmaSelectOp.layer.borderColor = NSColor.grayColor.CGColor;
+    //_viewFirmaSelectOp.layer.borderWidth = 8.0;
 //    _viewFirmaSelectOp.layer.masksToBounds = false;
     
 //    [_viewFirmaSelectOp updateLayer];
@@ -231,7 +269,7 @@ void* hModule;
         if(textField.tag > 1)
         {
             NSTextField* textField1;
-            if(textField.stringValue.length == 0)
+            if(textField.stringValue.length == 0 && textField.tag != 9)
             {
                 textField1 = [self.view viewWithTag:textField.tag - 1];
             }
@@ -258,24 +296,29 @@ void* hModule;
     
     if(textField.tag > 0)
     {
-        if(textField.tag < 8)
+        if(textField.tag < 13)
         {
-            NSTextField* textField1 = [self.view viewWithTag:textField.tag + 1];
-            textField1.stringValue = @"";
-            [textField1 selectText:nil];
+            if(textField.tag == 8 || textField.tag == 12)
+            {
+                textField.stringValue = [textField.stringValue substringToIndex:1];
+            }else
+            {
+                NSTextField* textField1 = [self.view viewWithTag:textField.tag + 1];
+                textField1.stringValue = @"";
+                [textField1 selectText:nil];
+            }
         }
         else
         {
             textField.stringValue = [textField.stringValue substringToIndex:1];
         }
     }
+    
 }
 
 CK_RV progressCallback(const int progress,
                        const char* szMessage)
 {
-    
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         labelProgressPointer.stringValue = [NSString stringWithUTF8String:szMessage];
         progressIndicatorPointer.doubleValue = progress;
@@ -283,6 +326,17 @@ CK_RV progressCallback(const int progress,
     
     return 0;
 }
+
+CK_RV progressFirmaCallback(const int progress,
+                       const char* szMessage)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        progressIndicatorPointerFirma.doubleValue = progress;
+    });
+    
+    return 0;
+}
+
 
 CK_RV progressCallbackCambioPIN(const int progress,
                        const char* szMessage)
@@ -309,13 +363,38 @@ CK_RV progressCallbackSbloccoPIN(const int progress,
     return 0;
 }
 
+CK_RV completedFirmaCallback(int ret)
+{
+    NSLog(@"Firma completata");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        if(ret == 0)
+        {
+            lblProgressFirmaPointer.stringValue = @"File firmato con successo";
+            imgFirmaOkPointer.hidden = NO;
+        }else
+        {
+            lblProgressFirmaPointer.stringValue = @"Si è verificato un errore durante la firma";
+            //TODO impostare immagine errore
+            //imgFirmaOkPointer
+        }
+        
+        progressIndicatorPointerFirma.hidden = YES;
+        btnConcludiFirmaPointer.hidden = NO;
+        btnAnnullaFirmaPointer.hidden = YES;
+        btnFirmaPointer.hidden = YES;
+        
+    });
+    
+    
+    return 0;
+}
+
 CK_RV completedCallback(string& PAN,
                         string& name,
                         string& ef_seriale)
 {
-    
-    NSLog(@"CompletedCallback %s %s %s", PAN.c_str(), name.c_str(), ef_seriale.c_str());
-    
     
     sPAN = PAN;
     sName = name;
@@ -471,6 +550,16 @@ CK_RV completedCallback(string& PAN,
 }
 
 - (IBAction)firmaElettronica:(id)sender {
+    [self showFirmaPinView];
+    
+    _lblCades.textColor = NSColor.grayColor;
+    _lblCadesSub.textColor = NSColor.grayColor;
+    _lblPades.textColor = NSColor.grayColor;
+    _lblPadesSub.textColor = NSColor.grayColor;
+    _cbFirmaGrafica.state = NSOffState;
+    _btnProseguiFirmaOp.enabled = NO;
+    operation = NO_OP;
+    
     [self showFirmaElettronica];
 }
 
@@ -1635,18 +1724,21 @@ CK_RV completedCallback(string& PAN,
         NSView* cV = [cG getView:SELECT_OP_PAGE];
                 
         NSTextField* lblPath = [cV viewWithTag:1];
-        lblPath.stringValue = path;
+        lblPath.stringValue = filePath;
         
         [cG showSubView:SELECT_OP_PAGE];
         
     }
 }
+
+
 - (IBAction)btnFirmaOp:(id)sender {
-    NSLog(@"Selected Firma Operation");
+    filePath = _lblPathOp.stringValue;
+    _filePathSignOp.stringValue = filePath;
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FIRMA_OP];
     
-    _filePathSignOp.stringValue = [filePath stringByReplacingOccurrencesOfString:@"/" withString:@" ▶︎ "];
+    //_filePathSignOp.stringValue = [filePath stringByReplacingOccurrencesOfString:@"/" withString:@" ▶︎ "];
     
 }
 
@@ -1657,6 +1749,14 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)btnAnnullaOp:(id)sender {
     
+    _btnProseguiFirmaOp.enabled = NO;
+    _lblCades.textColor = NSColor.grayColor;
+    _lblCadesSub.textColor = NSColor.grayColor;
+    _lblPades.textColor = NSColor.grayColor;
+    _lblPadesSub.textColor = NSColor.grayColor;
+    
+    operation = NO_OP;
+    
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FILE_PAGE];
     
@@ -1665,12 +1765,13 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)CadesClick:(id)sender {
     
-    _lblCades.textColor = NSColor.blackColor;
+    _lblCades.textColor = NSColor.blueColor;
     _lblCadesSub.textColor = NSColor.blackColor;
     _lblPades.textColor = NSColor.grayColor;
     _lblPadesSub.textColor = NSColor.grayColor;
+    _btnProseguiFirmaOp.enabled = YES;
     
-    operation  = FIRMA_CADES;
+    operation = FIRMA_CADES;
     _cbFirmaGrafica.state = NSOffState;
     //TODO mettere immagine colorata
 }
@@ -1679,11 +1780,11 @@ CK_RV completedCallback(string& PAN,
     
     _lblCades.textColor = NSColor.grayColor;
     _lblCadesSub.textColor = NSColor.grayColor;
-    
-    _lblPades.textColor = NSColor.blackColor;
+    _lblPades.textColor = NSColor.redColor;
     _lblPadesSub.textColor = NSColor.blackColor;
+    _btnProseguiFirmaOp.enabled = YES;
     
-    operation  = FIRMA_PADES;
+    operation = FIRMA_PADES;
     //TODO mettere immagine colorata
     
 }
@@ -1693,24 +1794,39 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)btnProseguiFirmaOp:(id)sender {
     
-    ChangeView *cG = [ChangeView getInstance];
-    NSView* cV = [cG getView:SELECT_OP_PAGE];
-    NSTextField* lblPath = [cV viewWithTag:1];
-    NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
-    
     for (NSView *aSubview in [[self prevImageView] subviews]) {
         [aSubview removeFromSuperview];
     }
     
-    pdfPreview = [[PdfPreview alloc] initWithPrImageView:[self prevImageView] pdfPath:lblPath.stringValue signImagePath:signImgPath];
+    ChangeView *cG = [ChangeView getInstance];
     
-    _lblPathFirmaPrev.stringValue = path ;
-    
-    [cG showSubView:FIRMA_PDF_PREVIEW];
-    
+    if(operation == FIRMA_PADES && (_cbFirmaGrafica.state == NSOnState))
+    {
+        NSLog(@"Firma pades con firma grafica");
+        NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
+
+        pdfPreview = [[PdfPreview alloc] initWithPrImageView:[self prevImageView] pdfPath: filePath signImagePath:signImgPath];
+        
+        _lblPathFirmaPrev.stringValue = filePath ;
+        [cG showSubView:FIRMA_PDF_PREVIEW];
+    }else
+    {
+        NSLog(@"Firma senza grafica");
+        _lblPathFirmaPin.stringValue = filePath;
+        [cG showSubView:FIRMA_PIN_PAGE];
+    }
 }
 
 - (IBAction)btnAnnullaFirmaOp:(id)sender {
+    
+    _lblCades.textColor = NSColor.grayColor;
+    _lblCadesSub.textColor = NSColor.grayColor;
+    _lblPades.textColor = NSColor.grayColor;
+    _lblPadesSub.textColor = NSColor.grayColor;
+    _btnProseguiFirmaOp.enabled = NO;
+    _cbFirmaGrafica.state = NSOffState;
+    operation = NO_OP;
+    
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_OP_PAGE];
 }
@@ -1721,6 +1837,256 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)pdfPageDown:(id)sender {
     [pdfPreview pageDown];
+}
+
+- (IBAction)ProseguiFirma:(id)sender {
+    //TODO prendere posizione firma grafica
+    
+    _lblPathFirmaPin.stringValue = filePath;
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:FIRMA_PIN_PAGE];
+}
+- (IBAction)annullaFirmaClick:(id)sender {
+    
+    _lblInsertPin.hidden = NO;
+    _cvInsertPin.hidden = NO;
+    _btnAnnulla.hidden = NO;
+    _btnConcludiFirma.hidden = YES;
+    _progressFirma.hidden = YES;
+    _lblProgressFirma.hidden = YES;
+    
+    ChangeView *cG = [ChangeView getInstance];
+    if(_cbFirmaGrafica.state == NSOnState)
+    {
+        [cG showSubView:FIRMA_PDF_PREVIEW];
+    }else
+    {
+        [cG showSubView:SELECT_FIRMA_OP];
+    }
+}
+
+- (IBAction)firmaClick:(id)sender {
+    
+    _lblInsertPin.hidden = YES;
+    _cvInsertPin.hidden = YES;
+    _btnConcludiFirma.hidden = YES;
+    _btnFirma.enabled = NO;
+    _btnAnnullaFirma.enabled = NO;
+    _progressFirma.hidden = NO;
+    _lblProgressFirma.hidden = NO;
+    //_btnFirmaElettronica.enabled = NO;
+    
+    NSString* pin = @"";
+    
+    for(int i = 9; i < 13; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        pin = [pin stringByAppendingString:txtField.stringValue];
+    }
+    
+    if(pin.length != 4)
+    {
+        [self showMessage: @"Inserire le ultime 4 cifre del PIN" withTitle:@"PIN non corretto" exitAfter:false];
+        [self showFirmaPinView];
+        return;
+    }
+    
+    unichar c = [pin characterAtIndex:0];
+    
+    int i = 1;
+    for(i = 1; i < pin.length && (c >= '0' && c <= '9'); i++)
+    {
+        c = [pin characterAtIndex:i];
+    }
+    
+    if(i < pin.length || !(c >= '0' && c <= '9'))
+    {
+        [self showMessage: @"Il PIN deve essere composto da 4 numeri" withTitle:@"PIN non corretto" exitAfter:false];
+        
+        [self showFirmaPinView];
+        return;
+    }
+    
+    NSSavePanel *panel = [NSSavePanel savePanel];
+    [panel setMessage:@"Scegliere dove salvare il file firmato"]; // Message inside modal window
+    [panel setExtensionHidden:NO];
+    [panel setCanCreateDirectories:YES];
+    [panel setTitle:@"Salva file firmato"];
+    [panel setAllowsOtherFileTypes:NO];
+
+    if(operation == FIRMA_PADES)
+    {
+        [panel setAllowedFileTypes:[[NSArray alloc] initWithObjects:@"pdf", nil]];
+        [panel beginWithCompletionHandler:^(NSInteger result) {
+            
+            if (result == NSModalResponseOK)
+            {
+                NSString *outPath = [[panel URL] path];
+                
+                if(_cbFirmaGrafica.state == NSOnState)
+                {
+                   NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
+                   NSArray *array = [pdfPreview getSignImageInfos];
+                   
+                   [self firmaConCie:sender inputFilePath:filePath outFilePath:outPath signImagePath:signImgPath pin:pin x:[array[0] floatValue] y:[array[1] floatValue] w:[array[2] floatValue] h:[array[3] floatValue] fileType:@"pdf"];
+                }else
+                {
+                   [self firmaConCie:sender inputFilePath:filePath outFilePath:outPath signImagePath:NULL pin:pin x:0.0 y:0.0 w:0.0 h:0.0 fileType:@"pdf"];
+                }
+            }
+        }];
+    }else{
+        [panel setAllowedFileTypes:[[NSArray alloc] initWithObjects:@"p7m", nil]];
+        [panel beginWithCompletionHandler:^(NSInteger result) {
+            if (result == NSModalResponseOK)
+            {
+                NSString *outPath = [[panel URL] path];
+                
+                [self firmaConCie:sender inputFilePath:filePath outFilePath:outPath signImagePath:NULL pin:pin x:0.0 y:0.0 w:0.0 h:0.0 fileType:@"p7m"];
+            }
+            
+        }];
+
+    }
+}
+
+-(void)firmaConCie: (NSControl*) sender inputFilePath:(NSString*)inPath outFilePath:(NSString*)outPath  signImagePath:(NSString*)signImagePath pin: (NSString*)pin x:(float) x y:(float) y w:(float) w h:(float) h fileType:(NSString*)fileType
+{
+    int pageNumber = [pdfPreview getSelectedPage];
+    //NSString* fileType = @"pdf";
+    
+    [sender setEnabled:NO];
+    
+    dispatch_async(dispatch_get_global_queue(0,0), ^{
+
+        firmaConCIEfn pfnFirmaConCie = (firmaConCIEfn)dlsym(hModule, "firmaConCIE");
+        if(!pfnFirmaConCie)
+        {
+            dlclose(hModule);
+            [self showMessage: @"Funzione firmaConCie non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
+            return;
+        }
+        
+        NSString *pan = [[self.carouselView getSelectedCard] getPan];
+        
+        long ret = pfnFirmaConCie([inPath UTF8String], [fileType UTF8String], [pin UTF8String], [pan UTF8String], pageNumber, x, y, w, h, [signImagePath UTF8String], [outPath UTF8String], &progressFirmaCallback, &completedFirmaCallback);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+
+            [((NSControl*)sender) setEnabled:YES];
+            
+            switch(ret)
+            {
+                case CKR_TOKEN_NOT_RECOGNIZED:
+                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                    
+                case CKR_TOKEN_NOT_PRESENT:
+                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_PIN_INCORRECT:
+                    [self showMessage:[NSString stringWithFormat:@"Il PIN digitato è errato"] withTitle:@"PIN non corretto" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_PIN_LOCKED:
+                    [self showMessage:@"Munisciti del codice PUK e utilizza la funzione di sblocco carta per abilitarla" withTitle:@"Carta bloccata" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_GENERAL_ERROR:
+                    [self showMessage:@"Errore inaspettato durante la comunicazione con la smart card" withTitle:@"Errore inaspettato" exitAfter:false];
+                    [self showFirmaPinView];
+                case CARD_PAN_MISMATCH:
+                    [self showMessage:@"CIE selezionata diversa da quella presente sul lettore" withTitle:@"CIE non corrispondente" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+            }
+            
+        });
+    });
+    
+}
+
+-(void)showFirmaPinView
+{
+    for(int i = 9; i < 13; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    _lblInsertPin.hidden = NO;
+    _cvInsertPin.hidden = NO;
+    _btnAnnulla.hidden = NO;
+    _btnFirma.enabled = YES;
+    _btnAnnullaFirma.enabled = YES;
+    _progressFirma.hidden = YES;
+    _lblProgressFirma.stringValue = @"Firma in corso...";
+    _lblProgressFirma.hidden = YES;
+    _btnConcludiFirma.hidden = YES;
+    imgFirmaOkPointer.hidden = YES;
+}
+
+- (IBAction)concludiClick:(id)sender {
+    _lblInsertPin.hidden = NO;
+    _cvInsertPin.hidden = NO;
+    _btnAnnullaFirma.hidden = NO;
+    _btnFirma.hidden = NO;
+    _btnFirma.enabled = YES;
+    _btnAnnullaFirma.enabled = YES;
+    _progressFirma.hidden = YES;
+    _lblProgressFirma.stringValue = @"Firma in corso...";
+    _lblProgressFirma.hidden = YES;
+    _btnConcludiFirma.hidden = YES;
+    imgFirmaOkPointer.hidden = YES;
+    
+    for(int i = 9; i < 13; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_FILE_PAGE];
+    
+}
+
+- (IBAction)personalizzaClick:(id)sender {
+    
+    _signImageView.image = [[NSImage alloc] initWithContentsOfFile:@"/Users/piero/.CIEPKI/acapocchia.png"];
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:PERSONALIZZA_FIRMA_PAGE];
+}
+
+- (IBAction)indietroClick:(id)sender {
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_FILE_PAGE];
+}
+
+- (IBAction)slectFirmaSignClick:(id)sender {
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setMessage:@"Selezionare una firma personalizzata"];
+    [panel setExtensionHidden:NO];
+    [panel setCanCreateDirectories:YES];
+    [panel setAllowsOtherFileTypes:NO];
+    
+    [panel setAllowedFileTypes:[[NSArray alloc] initWithObjects:@"png", nil]];
+    [panel beginWithCompletionHandler:^(NSInteger result) {
+        if (result == NSModalResponseOK)
+        {
+            NSString *outPath = [[panel URL] path];
+            
+            _signImageView.image = [[NSImage alloc] initWithContentsOfFile:outPath];
+            NSLog(@"ok");
+        }
+        
+    }];
 }
 
 @end

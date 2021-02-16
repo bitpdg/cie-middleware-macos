@@ -104,11 +104,14 @@ uint16_t CIESign::sign(const char* inFilePath, const char* type, const char* pin
 				throw ret;
 			}
 
-			ret = disigon_sign_set(ctx, DISIGON_OPT_PDF_IMAGEPATH, (void*)imagePathFile);
-			if (ret != 0)
-			{
-				throw ret;
-			}
+            if (imagePathFile)
+            {
+                ret = disigon_sign_set(ctx, DISIGON_OPT_PDF_IMAGEPATH, (void*)imagePathFile);
+                if (ret != 0)
+                {
+                    throw ret;
+                }
+            }
 
 			ret = disigon_sign_set(ctx, DISIGON_OPT_INPUTFILE_TYPE, (void*)DISIGON_FILETYPE_PDF);
 			if (ret != 0)

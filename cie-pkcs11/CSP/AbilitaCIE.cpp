@@ -32,7 +32,8 @@
 
 #define ROLE_USER                   1
 #define ROLE_ADMIN                  2
-#define CARD_ALREADY_ENABLED        0x000000F0;
+#define CARD_ALREADY_ENABLED        0x000000F0
+#define CARD_PAN_MISMATCH            (int)(0x000000F1)
 
 OID OID_SURNAME = ((OID(2) += 5) += 4) += 4;
 
@@ -67,7 +68,7 @@ extern "C" {
     CK_RV CK_ENTRY VerificaCIEAbilitata(const char*  szPAN);
     CK_RV CK_ENTRY DisabilitaCIE(const char*  szPAN);
     CK_RV CK_ENTRY verificaConCIE(const char* inFilePath);
-    CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath);
+    CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, const char* pan, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath, PROGRESS_CALLBACK progressCallBack, SIGN_COMPLETED_CALLBACK completedCallBack);
 }
 
 CK_RV CK_ENTRY verificaConCIE(const char* inFilePath)
@@ -93,7 +94,7 @@ CK_RV CK_ENTRY verificaConCIE(const char* inFilePath)
     
 }
 
-CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath)
+CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char* pin, const char* pan, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath, PROGRESS_CALLBACK progressCallBack, SIGN_COMPLETED_CALLBACK completedCallBack)
 {
 
     printf("page: %d, x: %f, y: %f, w: %f, h: %f", page, x, y, w, h);
@@ -132,54 +133,94 @@ CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char*
         }
 
         char *curreader = readers;
-        
+        bool foundCIE = false;
         for (; curreader[0] != 0; curreader += strnlen(curreader, len) + 1)
         {
-
             safeConnection conn(hSC, curreader, SCARD_SHARE_SHARED);
             if (!conn.hCard)
                 continue;
 
-            LONG res = 0;
-
-            res = SCardBeginTransaction(conn.hCard);
-
-            while (res != SCARD_S_SUCCESS)
-            {
-                DWORD protocol = 0;
-                SCardReconnect(conn.hCard, SCARD_SHARE_SHARED, SCARD_PROTOCOL_Tx, SCARD_UNPOWER_CARD, &protocol);
-                OutputDebugString("errore\n");
-                res = SCardBeginTransaction(conn.hCard);
-            }
-
-            DWORD atrLen = 40;
-            res = SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen);
-            if (res != SCARD_S_SUCCESS) {
+            uint32_t atrLen = 40;
+            if(SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
                 free(readers);
-                OutputDebugString("GetAttrib ko 1, %lu\n", res);
                 return CKR_DEVICE_ERROR;
             }
-
-
+            
             ATR = (char*)malloc(atrLen);
-
-            if (SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
+            
+            if(SCardGetAttrib(conn.hCard, SCARD_ATTR_ATR_STRING, (uint8_t*)ATR, &atrLen) != SCARD_S_SUCCESS) {
                 free(readers);
                 free(ATR);
                 return CKR_DEVICE_ERROR;
             }
-
+            
             ByteArray atrBa((BYTE*)ATR, atrLen);
+
+            progressCallBack(20, "");
+
             IAS* ias = new IAS((CToken::TokenTransmitCallback)TokenTransmitCallback, atrBa);
             ias->SetCardContext(&conn);
+            
+            foundCIE = false;
+            ias->token.Reset();
+            ias->SelectAID_IAS();
+            ias->ReadPAN();
+            
+            foundCIE = true;
+            ByteDynArray IntAuth;
+            ias->SelectAID_CIE();
+            ias->ReadDappPubKey(IntAuth);
+            ias->SelectAID_CIE();
+            ias->InitEncKey();
+
+            ByteDynArray IdServizi;
+            ias->ReadIdServizi(IdServizi);
+            ByteArray baPan = ByteArray((uint8_t*)pan, strlen(pan));
+
+            if (memcmp(baPan.data(), IdServizi.data(), IdServizi.size()) != 0)
+            {
+                return CARD_PAN_MISMATCH;
+            }
+            
+            ByteDynArray FullPIN;
+            ByteArray LastPIN = ByteArray((uint8_t*)pin, strlen(pin));
+            ias->GetFirstPIN(FullPIN);
+            FullPIN.append(LastPIN);
+            ias->token.Reset();
+            
+            progressCallBack(40, "");
+
+            char fullPinCStr[9];
+            memcpy(fullPinCStr, FullPIN.data(), 8);
+            fullPinCStr[8] = 0;
 
             CIESign* cieSign = new CIESign(ias);
 
-            uint16_t ret = cieSign->sign(inFilePath, type, pin, page, x, y, w, h, imagePathFile, outFilePath);
+            uint16_t ret = cieSign->sign(inFilePath, type, fullPinCStr, page, x, y, w, h, imagePathFile, outFilePath);
+            if((ret & (0x63C0)) == 0x63C0)
+            {
+                return CKR_PIN_INCORRECT;
+            }else if (ret == 0x6983)
+            {
+                return CKR_PIN_LOCKED;
+            }
+            
+            
+            progressCallBack(100, "");
+            
             OutputDebugString("CieSign ret: %d", ret);
 
             free(ias);
             free(cieSign);
+
+            completedCallBack(ret);
+        }
+        
+        if (!foundCIE) {
+            free(ATR);
+            free(readers);
+            return CKR_TOKEN_NOT_RECOGNIZED;
+            
         }
     }
     catch (std::exception &ex) {
@@ -198,7 +239,6 @@ CK_RV CK_ENTRY firmaConCIE(const char* inFilePath, const char* type, const char*
         free(ATR);
 
     free(readers);
-
     return SCARD_S_SUCCESS;
 }
 
