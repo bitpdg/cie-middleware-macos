@@ -36,4 +36,7 @@ typedef CK_RV (*AbilitaCIEfn)(const char*  szPAN,
 typedef CK_RV (*VerificaCIEAbilitatafn)(const char*  szPAN);
 typedef CK_RV (*DisabilitaCIEfn)(const char*  szPAN);
 typedef CK_RV (*firmaConCIEfn)(const char* inFilePath, const char* type, const char* pin, const char* pan, int page, float x, float y, float w, float h, const char* imagePathFile, const char* outFilePath, PROGRESS_CALLBACK progressCallBack, SIGN_COMPLETED_CALLBACK completedCallBack);
+typedef CK_RV (*verificaConCIEfn)(const char* inFilePath);
+typedef CK_RV (*getVerifyInfofn)(int index, struct verifyInfo_t* vInfos);
+typedef CK_RV (*getNumberOfSignfn)();
 

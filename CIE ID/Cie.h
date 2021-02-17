@@ -18,7 +18,8 @@
 -(NSString*) getName;
 -(NSString*) getSerialNumber;
 -(NSString*) getPan;
-
+-(BOOL)getCustomSign;
+-(void)customSignSet: (BOOL)setValue;
 @end
 
 #endif /* Cie_h */

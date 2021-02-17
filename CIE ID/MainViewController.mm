@@ -23,6 +23,7 @@
 
 #include "../cie-pkcs11/CSP/AbilitaCIE.h"
 #include "../cie-pkcs11/CSP/PINManager.h"
+#include "../cie-pkcs11/Sign/CIEVerify.h"
 
 #define CARD_ALREADY_ENABLED        0x000000F0
 #define CARD_PAN_MISMATCH           0x000000F1
@@ -60,6 +61,13 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSTextField *lblPathOp;
 @property (weak) IBOutlet NSButton *btnProseguiFirmaOp;
 @property (weak) IBOutlet NSImageView *signImageView;
+@property (weak) IBOutlet NSTextField *lblFirmaHome;
+@property (weak) IBOutlet NSTextField *lblSubFirmaHome;
+@property (weak) IBOutlet NSTextFieldCell *lblFirmaPersonalizata;
+@property (weak) IBOutlet NSButton *btnPersonalizza;
+@property (weak) IBOutlet NSTextField *lblFirmaPersonalizzataSub;
+@property (weak) IBOutlet NSTextField *lblPersonalizzata;
+
 
 
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
@@ -475,6 +483,7 @@ CK_RV completedCallback(string& PAN,
 {
 
     NSString* pan = [removingCie getPan];
+    NSString* serialNumber = [removingCie getSerialNumber];
     removingCie = nil;
     
     // check se abilitata ossia se cache presente
@@ -527,6 +536,9 @@ CK_RV completedCallback(string& PAN,
 
             [cieList removeCie:pan];
             [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
+            
+            NSFileManager *manager = [NSFileManager defaultManager];
+            [manager removeItemAtPath:[self getSignImagePath:serialNumber] error:NULL];
 
             [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
             [NSUserDefaults.standardUserDefaults synchronize];
@@ -546,20 +558,14 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)home:(id)sender
 {
+    _lblFirmaHome.stringValue = @"CIE ID";
+    _lblSubFirmaHome.stringValue = @"Carta di Identità Elettrinica abbinata correttamente";
     [self showHomeFirstPage];
 }
 
 - (IBAction)firmaElettronica:(id)sender {
     [self showFirmaPinView];
-    
-    _lblCades.textColor = NSColor.grayColor;
-    _lblCadesSub.textColor = NSColor.grayColor;
-    _lblPades.textColor = NSColor.grayColor;
-    _lblPadesSub.textColor = NSColor.grayColor;
-    _cbFirmaGrafica.state = NSOffState;
-    _btnProseguiFirmaOp.enabled = NO;
-    operation = NO_OP;
-    
+
     [self showFirmaElettronica];
 }
 
@@ -1144,8 +1150,24 @@ CK_RV completedCallback(string& PAN,
         self.sbloccoOKPageView.hidden = YES;
          */
         
+        
+        _lblCades.textColor = NSColor.grayColor;
+        _lblCadesSub.textColor = NSColor.grayColor;
+        _lblPades.textColor = NSColor.grayColor;
+        _lblPadesSub.textColor = NSColor.grayColor;
+        _cbFirmaGrafica.state = NSOffState;
+        _btnProseguiFirmaOp.enabled = NO;
+        
+        operation = NO_OP;
+        
+        _lblFirmaHome.stringValue = @"Firma Elettronica";
+        _lblSubFirmaHome.stringValue = @"Seleziona la CIE da utilizzare";
+        
+        [self.carouselView changeButtonViews];
+        
         ChangeView *cG = [ChangeView getInstance];
-        [cG showSubView:SELECT_FILE_PAGE];
+        [cG showSubView:HOME_FOURTH_PAGE];
+        
         
         
     });
@@ -1234,6 +1256,8 @@ CK_RV completedCallback(string& PAN,
             ChangeView *cG = [ChangeView getInstance];
             [cG showSubView:HOME_FIRST_PAGE];
             
+            [_btnFirmaElettronica setEnabled:NO];
+            
             for(int i = 1; i < 9; i++)
             {
                 NSTextField* txtField = [self.view viewWithTag:i];
@@ -1313,6 +1337,7 @@ CK_RV completedCallback(string& PAN,
 {
     [self.carouselView configureWithCards:[[cieList getDictionary] allValues]];
     
+    [_btnFirmaElettronica setEnabled:YES];
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.homeButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
@@ -1710,7 +1735,6 @@ CK_RV completedCallback(string& PAN,
     
     NSOpenPanel *panel = [[NSOpenPanel alloc] init];
     
-    
     if ([panel runModal] == NSModalResponseOK)
     {
         NSArray* selectedFile = [panel URLs];
@@ -1735,8 +1759,20 @@ CK_RV completedCallback(string& PAN,
 - (IBAction)btnFirmaOp:(id)sender {
     filePath = _lblPathOp.stringValue;
     _filePathSignOp.stringValue = filePath;
+    
+    NSString* fileType = [[NSURL URLWithString:filePath] pathExtension];
+    
+    if([fileType isEqualTo:@"pdf"])
+    {
+        [_cbFirmaGrafica setEnabled:YES];
+    }else
+    {
+        [_cbFirmaGrafica setEnabled:NO];
+    }
+    
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FIRMA_OP];
+    
     
     //_filePathSignOp.stringValue = [filePath stringByReplacingOccurrencesOfString:@"/" withString:@" ▶︎ "];
     
@@ -1744,7 +1780,7 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)btnVerificaOp:(id)sender {
     NSLog(@"Selected Verifica Operation");
-    
+    [self verificaConCie:sender inputFilePath:filePath];
 }
 
 - (IBAction)btnAnnullaOp:(id)sender {
@@ -1762,7 +1798,6 @@ CK_RV completedCallback(string& PAN,
     
 }
 
-
 - (IBAction)CadesClick:(id)sender {
     
     _lblCades.textColor = NSColor.blueColor;
@@ -1773,23 +1808,64 @@ CK_RV completedCallback(string& PAN,
     
     operation = FIRMA_CADES;
     _cbFirmaGrafica.state = NSOffState;
+
     //TODO mettere immagine colorata
 }
 
 - (IBAction)PadesClick:(id)sender {
+    NSString* fileType = [[NSURL URLWithString:filePath] pathExtension];
     
-    _lblCades.textColor = NSColor.grayColor;
-    _lblCadesSub.textColor = NSColor.grayColor;
-    _lblPades.textColor = NSColor.redColor;
-    _lblPadesSub.textColor = NSColor.blackColor;
-    _btnProseguiFirmaOp.enabled = YES;
-    
-    operation = FIRMA_PADES;
+    if([fileType isEqualTo:@"pdf"])
+    {
+        _lblCades.textColor = NSColor.grayColor;
+        _lblCadesSub.textColor = NSColor.grayColor;
+        _lblPades.textColor = NSColor.redColor;
+        _lblPadesSub.textColor = NSColor.blackColor;
+        _btnProseguiFirmaOp.enabled = YES;
+        
+        operation = FIRMA_PADES;
+    }
     //TODO mettere immagine colorata
     
 }
 - (IBAction)cbFirmaGraficaClick:(id)sender {
     [self PadesClick:0];
+}
+
+-(NSString*)getSignImagePath: (NSString*)serial
+{
+    NSString * homeDir = NSHomeDirectory();
+    NSString* signImgPath = [NSString stringWithFormat:@"%@/%@/%@_default.png", homeDir, @".CIEPKI", serial];
+    NSLog(@"%@", signImgPath);
+    
+    return signImgPath;
+}
+
+-(void)drawText: (NSString*)text pathToFile: (NSString*)path{
+    NSDictionary *attributes =
+      @{ NSFontAttributeName : [NSFont fontWithName:@"Allura-Regular" size:60.0],
+      NSForegroundColorAttributeName : NSColor.blackColor};
+    
+    NSImage *img = [[NSImage alloc] initWithSize:[text sizeWithAttributes:attributes]];
+    [img lockFocus];
+    [[NSColor whiteColor] set];
+    CGRect rc = NSMakeRect(0,0,[img size].width, [img size].height);
+    NSRectFill(rc);
+    [img drawInRect:rc];
+    [text drawAtPoint:NSZeroPoint withAttributes:attributes];
+    
+    [img unlockFocus];
+    
+    NSData *imageData = [img TIFFRepresentation];
+    NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
+    
+    NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
+    imageData = [imageRep representationUsingType:NSBitmapImageFileTypePNG properties:imageProps];
+    
+    NSError *error = nil;
+    
+    [imageData writeToFile:path options:NSDataWritingAtomic error:&error];
+    NSLog(@"Write returned error: %@", [error localizedDescription]);
 }
 
 - (IBAction)btnProseguiFirmaOp:(id)sender {
@@ -1803,8 +1879,18 @@ CK_RV completedCallback(string& PAN,
     if(operation == FIRMA_PADES && (_cbFirmaGrafica.state == NSOnState))
     {
         NSLog(@"Firma pades con firma grafica");
-        NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
-
+        Cie* selectedCie = [self.carouselView getSelectedCard];
+        NSString* signImgPath = [self getSignImagePath:[selectedCie getSerialNumber]];
+        
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if(![fileManager fileExistsAtPath: signImgPath])
+        {
+            NSLog(@"Firma grafica non presente, verrà creata");
+            
+            [self drawText:[selectedCie getName].capitalizedString pathToFile:signImgPath];
+        }
+        
         pdfPreview = [[PdfPreview alloc] initWithPrImageView:[self prevImageView] pdfPath: filePath signImagePath:signImgPath];
         
         _lblPathFirmaPrev.stringValue = filePath ;
@@ -1926,7 +2012,8 @@ CK_RV completedCallback(string& PAN,
                 
                 if(_cbFirmaGrafica.state == NSOnState)
                 {
-                   NSString* signImgPath = @"/Users/piero/.CIEPKI/acapocchia.png";
+                   Cie* selectedCie = [self.carouselView getSelectedCard];
+                   NSString* signImgPath = [self getSignImagePath:[selectedCie getSerialNumber]];
                    NSArray *array = [pdfPreview getSignImageInfos];
                    
                    [self firmaConCie:sender inputFilePath:filePath outFilePath:outPath signImagePath:signImgPath pin:pin x:[array[0] floatValue] y:[array[1] floatValue] w:[array[2] floatValue] h:[array[3] floatValue] fileType:@"pdf"];
@@ -2057,7 +2144,26 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)personalizzaClick:(id)sender {
     
-    _signImageView.image = [[NSImage alloc] initWithContentsOfFile:@"/Users/piero/.CIEPKI/acapocchia.png"];
+    Cie* selectedCie = [self.carouselView getSelectedCard];
+    NSString* signImgPath = [self getSignImagePath:[selectedCie getSerialNumber]];
+    
+    if([selectedCie getCustomSign])
+    {
+        _lblFirmaPersonalizata.stringValue = @"Una tua firma grafica personalizzata è già stata caricata. Vuoi aggiornarla?";
+    }else
+    {
+        _lblFirmaPersonalizata.stringValue = @"Abbiamo creato per te una firma grafica, ma se preferisci puoi personalizzarla. Questo passaggio non è indispensabile, ma ti consentirà di dare un tocco personale ai documenti firmati.";
+    }
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if(![fileManager fileExistsAtPath: signImgPath])
+    {
+        NSLog(@"Firma grafica non presente, verrà creata");
+        
+        [self drawText:[selectedCie getName].capitalizedString pathToFile:signImgPath];
+    }
+    
+    _signImageView.image = [[NSImage alloc] initWithContentsOfFile:signImgPath];
     
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:PERSONALIZZA_FIRMA_PAGE];
@@ -2065,11 +2171,12 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)indietroClick:(id)sender {
     
+    
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FILE_PAGE];
 }
 
-- (IBAction)slectFirmaSignClick:(id)sender {
+- (IBAction)selectFirmaSignClick:(id)sender {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setMessage:@"Selezionare una firma personalizzata"];
     [panel setExtensionHidden:NO];
@@ -2080,13 +2187,135 @@ CK_RV completedCallback(string& PAN,
     [panel beginWithCompletionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK)
         {
-            NSString *outPath = [[panel URL] path];
+            NSString *customImgPath = [[panel URL] path];
             
-            _signImageView.image = [[NSImage alloc] initWithContentsOfFile:outPath];
-            NSLog(@"ok");
+            Cie* selectedCie = [self.carouselView getSelectedCard];
+            NSString* signImgPath = [self getSignImagePath:[selectedCie getSerialNumber]];
+            
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            
+            NSError *error = nil;
+            
+            if ([fileManager fileExistsAtPath:signImgPath] == YES) {
+                [fileManager removeItemAtPath:signImgPath error:&error];
+            }
+            
+            if([fileManager copyItemAtPath:customImgPath toPath:signImgPath error:&error])
+            {
+                _signImageView.image = [[NSImage alloc] initWithContentsOfFile:signImgPath];
+                
+                //tenere traccia immagine custom
+                [selectedCie customSignSet:true];
+                
+                Cie* cie = [[cieList getDictionary] valueForKey:[selectedCie getPan]];
+                [cie customSignSet:true];
+                
+                [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
+                [NSUserDefaults.standardUserDefaults synchronize];
+                
+                _lblFirmaPersonalizata.stringValue = @"Una tua firma grafica personalizzata è già stata caricata. Vuoi aggiornarla?";
+                [_btnPersonalizza setTitle:@"Aggiorna"];
+                
+                [_lblPersonalizzata setHidden:NO];
+                [_lblFirmaPersonalizzataSub setHidden:YES];
+            }
         }
         
     }];
 }
 
+
+
+-(void)verificaConCie: (NSControl*) sender inputFilePath:(NSString*)inPath
+{
+    //NSString* fileType = @"pdf";
+    
+    [sender setEnabled:NO];
+    
+    dispatch_async(dispatch_get_global_queue(0,0), ^{
+
+        verificaConCIEfn pfnVerificaConCie = (verificaConCIEfn)dlsym(hModule, "verificaConCIE");
+        if(!pfnVerificaConCie)
+        {
+            dlclose(hModule);
+            [self showMessage: @"Funzione verificaConCIE non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
+            return;
+        }
+        
+        getVerifyInfofn pfngetVerifyInfo = (getVerifyInfofn)dlsym(hModule, "getVerifyInfo");
+        if(!pfngetVerifyInfo)
+        {
+            dlclose(hModule);
+            [self showMessage: @"Funzione getVerifyInfo non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
+            return;
+        }
+        
+        getNumberOfSignfn pfngetNumberOfSign = (getNumberOfSignfn)dlsym(hModule, "getNumberOfSign");
+        if(!pfngetNumberOfSign)
+        {
+            dlclose(hModule);
+            [self showMessage: @"Funzione getNumberOfSign non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
+            return;
+        }
+        
+        
+        verifyInfo_t verifyInfos[512];
+        long numOfSigns = 0;
+        
+        long ret = pfnVerificaConCie([inPath UTF8String]);
+        
+        if(ret == 0)
+        {
+            numOfSigns = pfngetNumberOfSign();
+            
+            for(int i = 0; i < numOfSigns; i++)
+            {
+                pfngetVerifyInfo(i, verifyInfos + i);
+            }
+            
+        }
+        
+        //show view verifica
+        
+        /*
+        dispatch_async(dispatch_get_main_queue(), ^{
+
+            [((NSControl*)sender) setEnabled:YES];
+            
+            switch(ret)
+            {
+                case CKR_TOKEN_NOT_RECOGNIZED:
+                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                    
+                case CKR_TOKEN_NOT_PRESENT:
+                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_PIN_INCORRECT:
+                    [self showMessage:[NSString stringWithFormat:@"Il PIN digitato è errato"] withTitle:@"PIN non corretto" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_PIN_LOCKED:
+                    [self showMessage:@"Munisciti del codice PUK e utilizza la funzione di sblocco carta per abilitarla" withTitle:@"Carta bloccata" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+                case CKR_GENERAL_ERROR:
+                    [self showMessage:@"Errore inaspettato durante la comunicazione con la smart card" withTitle:@"Errore inaspettato" exitAfter:false];
+                    [self showFirmaPinView];
+                case CARD_PAN_MISMATCH:
+                    [self showMessage:@"CIE selezionata diversa da quella presente sul lettore" withTitle:@"CIE non corrispondente" exitAfter:false];
+                    [self showFirmaPinView];
+                    break;
+            }
+            
+        });
+         */
+    });
+    
+}
+
 @end
+
+

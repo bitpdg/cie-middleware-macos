@@ -38,6 +38,7 @@
 		76A52D7025C43317004A0086 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76A52D1425C422F5004A0086 /* libexpat.a */; };
 		76A52D8125C4333B004A0086 /* libxml2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76A52C9225C40BDE004A0086 /* libxml2.a */; };
 		76A52D9225C4427F004A0086 /* libPods-cie-pkcs11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A3612AA9E73AB30473645 /* libPods-cie-pkcs11.a */; };
+		76F67E1025DD2A70002AB48D /* Allura-Regular.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 76F67E0E25DD29B8002AB48D /* Allura-Regular.ttf */; };
 		E504202C2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
 		E504202D2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
 		E504202E2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png in Resources */ = {isa = PBXBuildFile; fileRef = E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */; };
@@ -215,6 +216,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		76F67E0F25DD2A3C002AB48D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Fonts;
+			dstSubfolderSpec = 7;
+			files = (
+				76F67E1025DD2A70002AB48D /* Allura-Regular.ttf in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E526E9F621E0BAFF0098AE8A /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -281,6 +292,7 @@
 		76A52CBC25C41141004A0086 /* libcharset.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcharset.a; path = "cie-pkcs11/dependencies/libcharset.a"; sourceTree = "<group>"; };
 		76A52CBD25C41141004A0086 /* libiconv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libiconv.a; path = "cie-pkcs11/dependencies/libiconv.a"; sourceTree = "<group>"; };
 		76A52D1425C422F5004A0086 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = "cie-pkcs11/dependencies/libexpat.a"; sourceTree = "<group>"; };
+		76F67E0E25DD29B8002AB48D /* Allura-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Allura-Regular.ttf"; sourceTree = "<group>"; };
 		79847492CAD3310437BDE674 /* Pods-cie-pkcs11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cie-pkcs11.debug.xcconfig"; path = "Pods/Target Support Files/Pods-cie-pkcs11/Pods-cie-pkcs11.debug.xcconfig"; sourceTree = "<group>"; };
 		DC86202F63F36F82504EC0B3 /* Pods_CIE_ID.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CIE_ID.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E504202B2180665D00A41BF2 /* CIE-LOGO-REGISTRATO.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CIE-LOGO-REGISTRATO.png"; sourceTree = "<group>"; };
@@ -582,6 +594,14 @@
 			path = Sign;
 			sourceTree = "<group>";
 		};
+		76F67E0D25DD295D002AB48D /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				76F67E0E25DD29B8002AB48D /* Allura-Regular.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		B7FB7DAC107919BD2BEDD28E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -632,6 +652,7 @@
 		E544F56421BFAFC60038B2CA /* CIE ID */ = {
 			isa = PBXGroup;
 			children = (
+				76F67E0D25DD295D002AB48D /* Fonts */,
 				0883C2DD251C940E0054055E /* Carousel */,
 				7663CDD72518DF6A00FDC547 /* CieList.h */,
 				7663CDD82518DF6A00FDC547 /* CieList.m */,
@@ -1042,6 +1063,7 @@
 				E544F56021BFAFC60038B2CA /* Frameworks */,
 				E544F56121BFAFC60038B2CA /* Resources */,
 				E526E9F621E0BAFF0098AE8A /* Embed App Extensions */,
+				76F67E0F25DD2A3C002AB48D /* CopyFiles */,
 			);
 			buildRules = (
 			);
