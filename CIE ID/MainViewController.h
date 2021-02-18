@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* firmaPrevView;
 @property IBOutlet NSView* firmaPinView;
 @property IBOutlet NSView* personalizzaFirmaView;
+@property IBOutlet NSView* verificaView;
 
 @property IBOutlet NSTextField* labelHelp;
 @property IBOutlet WKWebView* helpWebView;

@@ -24,6 +24,8 @@
 #include "../cie-pkcs11/CSP/AbilitaCIE.h"
 #include "../cie-pkcs11/CSP/PINManager.h"
 #include "../cie-pkcs11/Sign/CIEVerify.h"
+#include "../cie-pkcs11/CSP/FirmaConCIE.h"
+#include "../cie-pkcs11/CSP/VerificaConCIE.h"
 
 #define CARD_ALREADY_ENABLED        0x000000F0
 #define CARD_PAN_MISMATCH           0x000000F1
@@ -33,7 +35,7 @@ using namespace std;
 typedef CK_RV (*C_GETFUNCTIONLIST)(CK_FUNCTION_LIST_PTR_PTR ppFunctionList);
 CK_FUNCTION_LIST_PTR g_pFuncList;
 
-@interface MainViewController() <CarouselViewDelegate> {
+@interface MainViewController() <CarouselViewDelegate, NSTableViewDataSource, NSTableViewDelegate> {
     Cie *removingCie;
 }
 
@@ -67,6 +69,10 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSButton *btnPersonalizza;
 @property (weak) IBOutlet NSTextField *lblFirmaPersonalizzataSub;
 @property (weak) IBOutlet NSTextField *lblPersonalizzata;
+@property (weak) IBOutlet NSTableView *tbVerificaInfo;
+@property (weak) IBOutlet NSTextField *lblVerificaPath;
+@property (weak) IBOutlet NSTextField *lblSottoscrittori;
+
 
 
 
@@ -82,9 +88,8 @@ typedef NS_ENUM(NSUInteger, signOp) {
 };
 
 
+
 @end
-
-
 
 @implementation MainViewController
 
@@ -116,6 +121,8 @@ string sEfSeriale;
 NSString* filePath;
 NSString *path;
 NSArray *viewArray;
+NSMutableArray <VerifyItem *> *verifyItems;
+
 
 signOp operation;
 PdfPreview* pdfPreview;
@@ -127,7 +134,7 @@ void* hModule;
 - (void)loadView {
     [super loadView];
     
-    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, _firmaPinView, _personalizzaFirmaView, nil];
+    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, _firmaPinView, _personalizzaFirmaView, _verificaView, nil];
     
     ChangeView *cG = [ChangeView getInstance];
     cG.viewArray = viewArray;
@@ -158,12 +165,13 @@ void* hModule;
     [self addSubviewToMainCustomView:_firmaPrevView];
     [self addSubviewToMainCustomView:_firmaPinView];
     [self addSubviewToMainCustomView:_personalizzaFirmaView];
+    [self addSubviewToMainCustomView:_verificaView];
     
     operation = NO_OP;
     
     if(([NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
     {
-
+         
         NSData *cieData = [NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"];
         
         CieList *test = [[CieList alloc] init:cieData];
@@ -217,19 +225,12 @@ void* hModule;
     cbFirmaGraficaPointer = _cbFirmaGrafica;
 
     self.carouselView.delegate = self;
+    
+    [self.tbVerificaInfo registerNib:[[NSNib alloc] initWithNibNamed:@"VerifyCell" bundle:nil]forIdentifier:@"verifyCellID"];
+    self.tbVerificaInfo.delegate = self;
+    self.tbVerificaInfo.dataSource = self;
 }
 
-- (void)viewDidLayout {
-    [super viewDidLayout];
-    
-    //_viewFirmaSelectOp.layer.cornerRadius = 8.0;
-    //_viewFirmaSelectOp.layer.borderColor = NSColor.grayColor.CGColor;
-    //_viewFirmaSelectOp.layer.borderWidth = 8.0;
-//    _viewFirmaSelectOp.layer.masksToBounds = false;
-    
-//    [_viewFirmaSelectOp updateLayer];
-    
-}
 
 - (void) addSubviewToMainCustomView:(NSView *)view {
     [view setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -1691,46 +1692,6 @@ CK_RV completedCallback(string& PAN,
     [self updateViewConstraints];
 }
 
-#pragma mark - CarouselViewDelegate
-
-- (void)shouldAddCard {
-    /*
-    self.homeFirstPageView.hidden = NO;
-    self.homeSecondPageView.hidden = YES;
-    self.homeThirdPageView.hidden = YES;
-    self.homeFourthPageView.hidden = YES;
-    self.cambioPINPageView.hidden = YES;
-    self.cambioPINOKPageView.hidden = YES;
-    self.sbloccoPageView.hidden = YES;
-    self.sbloccoOKPageView.hidden = YES;
-    self.helpPageView.hidden = YES;
-    self.infoPageView.hidden = YES;
-     */
-    ChangeView *cG = [ChangeView getInstance];
-    [cG showSubView:HOME_FIRST_PAGE];
-     
-    
-    for(int i = 1; i < 9; i++)
-    {
-        NSTextField* txtField = [self.view viewWithTag:i];
-        
-        txtField.stringValue = @"";
-    }
-    
-    NSTextField* txtField = [self.view viewWithTag:1];
-    [txtField selectText:nil];
-}
-
-- (void)shouldRemoveAllCards {
-    [self askRemoveAll:@"Vuoi rimuovere tutte le CIE attualmente abbinate?" withTitle:@"Rimozione CIE"];
-}
-
-- (void)shouldRemoveCard:(nonnull Cie *)card {
-    removingCie = card;
-    [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
-}
-
-
 - (IBAction)selectDocument:(id)sender {
     
     NSOpenPanel *panel = [[NSOpenPanel alloc] init];
@@ -1773,13 +1734,14 @@ CK_RV completedCallback(string& PAN,
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FIRMA_OP];
     
-    
     //_filePathSignOp.stringValue = [filePath stringByReplacingOccurrencesOfString:@"/" withString:@" ▶︎ "];
     
 }
 
 - (IBAction)btnVerificaOp:(id)sender {
     NSLog(@"Selected Verifica Operation");
+    filePath = _lblPathOp.stringValue;
+    _lblVerificaPath.stringValue = filePath;
     [self verificaConCie:sender inputFilePath:filePath];
 }
 
@@ -2127,6 +2089,7 @@ CK_RV completedCallback(string& PAN,
     _progressFirma.hidden = YES;
     _lblProgressFirma.stringValue = @"Firma in corso...";
     _lblProgressFirma.hidden = YES;
+    progressIndicatorPointerFirma.doubleValue = 0;
     _btnConcludiFirma.hidden = YES;
     imgFirmaOkPointer.hidden = YES;
     
@@ -2242,78 +2205,205 @@ CK_RV completedCallback(string& PAN,
             return;
         }
         
-        getVerifyInfofn pfngetVerifyInfo = (getVerifyInfofn)dlsym(hModule, "getVerifyInfo");
-        if(!pfngetVerifyInfo)
-        {
-            dlclose(hModule);
-            [self showMessage: @"Funzione getVerifyInfo non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
-            return;
-        }
+        //verifyInfo_t verifyInfos[512];
+        verifyInfos_t vInfos;
         
-        getNumberOfSignfn pfngetNumberOfSign = (getNumberOfSignfn)dlsym(hModule, "getNumberOfSign");
-        if(!pfngetNumberOfSign)
-        {
-            dlclose(hModule);
-            [self showMessage: @"Funzione getNumberOfSign non trovata nel middleware" withTitle:@"Errore inaspettato" exitAfter:NO];
-            return;
-        }
-        
-        
-        verifyInfo_t verifyInfos[512];
-        long numOfSigns = 0;
-        
-        long ret = pfnVerificaConCie([inPath UTF8String]);
+        //long ret = pfnVerificaConCie([inPath UTF8String]);
+        long ret = pfnVerificaConCie([inPath UTF8String], &vInfos);
         
         if(ret == 0)
         {
-            numOfSigns = pfngetNumberOfSign();
-            
-            for(int i = 0; i < numOfSigns; i++)
+            if(vInfos.n_infos == 0)
             {
-                pfngetVerifyInfo(i, verifyInfos + i);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [sender setEnabled:YES];
+                });
+                [self showMessage:@"Il file selezionato non contiene firme" withTitle:@"Verifica completata" exitAfter:false];
+                ChangeView *cG = [ChangeView getInstance];
+                [cG showSubView:SELECT_FILE_PAGE];
+            }else
+            {
+                int n_sign = vInfos.n_infos;
+                verifyItems = [NSMutableArray new];
+                for(int i = 0; i<vInfos.n_infos; i++)
+                {
+                    verifyInfo_t info = vInfos.infos[i];
+                    NSString *name = [NSString stringWithFormat:@"%s %s\n%s", info.name, info.surname, info.cn];
+                    VerifyItem *nameItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:name];
+                    
+                    NSString * signingTime = [[NSString alloc] initWithCString:info.signingTime encoding:NSUTF8StringEncoding];
+                    
+                    if(strcmp(info.signingTime, "") == 0)
+                    {
+                        signingTime = @"Attributo Signing Time non presente";
+                    }
+                    
+                    VerifyItem *signingTimeItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:signingTime];
+                    
+                    NSString * signValidity = @"La firma non è valida";
+                    
+                    if(info.isSignValid)
+                    {
+                        signValidity = @"La firma è valida";
+                    }
+                    
+                    VerifyItem *signValidtyItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:signValidity];
+                    
+                    
+                    NSString * certValidity = @"Il certificato non è valido";
+                    if(info.isCertValid)
+                    {
+                        certValidity = @"Il certificato è valido";
+                    }
+                    
+                    VerifyItem *certValidityItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:certValidity];
+                    
+                    
+                    NSString * certStatus = @"Servizio di revoca non raggiungibile";
+                    
+                    switch(info.CertRevocStatus)
+                    {
+                        case REVOCATION_STATUS_GOOD:
+                            certValidity = @"Il certificato non è stato revocato";
+                            break;
+                        case REVOCATION_STATUS_REVOKED:
+                            certValidity = @"Il certificato è stato revocato";
+                            break;
+                        case REVOCATION_STATUS_SUSPENDED:
+                            certValidity = @"Il certificato è stato sospeso";
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                    VerifyItem *certStatusItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:certStatus];
+                    
+                    
+                    NSString * cadn = [[NSString alloc] initWithCString:info.cadn encoding:NSUTF8StringEncoding];
+                    VerifyItem *cadnItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:cadn];
+                    //[cadnItem setEnlarge:true];
+                    cadnItem.enlarge = true;
+                    
+                    [verifyItems addObject:nameItem];
+                    [verifyItems addObject:signingTimeItem];
+                    [verifyItems addObject:signValidtyItem];
+                    [verifyItems addObject:certValidityItem];
+                    [verifyItems addObject:certStatusItem];
+                    [verifyItems addObject:cadnItem];
+                }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [sender setEnabled:YES];
+                    [self.tbVerificaInfo reloadData];
+                    self->_lblSottoscrittori.stringValue = [NSString stringWithFormat:@"Numero di sottoscrittori: %d",n_sign];
+                    ChangeView *cG = [ChangeView getInstance];
+                    [cG showSubView:VERIFICA_PAGE];
+                });
             }
-            
+        }else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [sender setEnabled:YES];
+            });
+            [self showMessage:@"Errore nella verifica del file" withTitle:@"Errore nella verifica" exitAfter:false];
+            ChangeView *cG = [ChangeView getInstance];
+            [cG showSubView:SELECT_FILE_PAGE];
         }
         
-        //show view verifica
-        
-        /*
-        dispatch_async(dispatch_get_main_queue(), ^{
-
-            [((NSControl*)sender) setEnabled:YES];
-            
-            switch(ret)
-            {
-                case CKR_TOKEN_NOT_RECOGNIZED:
-                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
-                    [self showFirmaPinView];
-                    break;
-                    
-                case CKR_TOKEN_NOT_PRESENT:
-                    [self showMessage:@"CIE non presente sul lettore" withTitle:@"Abilitazione CIE" exitAfter:false];
-                    [self showFirmaPinView];
-                    break;
-                case CKR_PIN_INCORRECT:
-                    [self showMessage:[NSString stringWithFormat:@"Il PIN digitato è errato"] withTitle:@"PIN non corretto" exitAfter:false];
-                    [self showFirmaPinView];
-                    break;
-                case CKR_PIN_LOCKED:
-                    [self showMessage:@"Munisciti del codice PUK e utilizza la funzione di sblocco carta per abilitarla" withTitle:@"Carta bloccata" exitAfter:false];
-                    [self showFirmaPinView];
-                    break;
-                case CKR_GENERAL_ERROR:
-                    [self showMessage:@"Errore inaspettato durante la comunicazione con la smart card" withTitle:@"Errore inaspettato" exitAfter:false];
-                    [self showFirmaPinView];
-                case CARD_PAN_MISMATCH:
-                    [self showMessage:@"CIE selezionata diversa da quella presente sul lettore" withTitle:@"CIE non corrispondente" exitAfter:false];
-                    [self showFirmaPinView];
-                    break;
-            }
-            
-        });
-         */
     });
     
+}
+
+#pragma mark - CarouselViewDelegate
+
+- (void)shouldAddCard {
+    /*
+    self.homeFirstPageView.hidden = NO;
+    self.homeSecondPageView.hidden = YES;
+    self.homeThirdPageView.hidden = YES;
+    self.homeFourthPageView.hidden = YES;
+    self.cambioPINPageView.hidden = YES;
+    self.cambioPINOKPageView.hidden = YES;
+    self.sbloccoPageView.hidden = YES;
+    self.sbloccoOKPageView.hidden = YES;
+    self.helpPageView.hidden = YES;
+    self.infoPageView.hidden = YES;
+     */
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:HOME_FIRST_PAGE];
+     
+    
+    for(int i = 1; i < 9; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    NSTextField* txtField = [self.view viewWithTag:1];
+    [txtField selectText:nil];
+}
+
+- (void)shouldRemoveAllCards {
+    [self askRemoveAll:@"Vuoi rimuovere tutte le CIE attualmente abbinate?" withTitle:@"Rimozione CIE"];
+}
+
+- (void)shouldRemoveCard:(nonnull Cie *)card {
+    removingCie = card;
+    [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    
+    if(verifyItems != nil)
+    {
+        return verifyItems.count;
+    }
+    
+    return 0;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    NSView* cell = [tableView makeViewWithIdentifier:@"verifyCellID" owner:nil];
+    if([cell isKindOfClass:[VerifyCell class]]){
+        VerifyCell* verifyCell = (VerifyCell*)cell;
+        VerifyItem* item = verifyItems[row];
+        [verifyCell configureWith:item];
+        return verifyCell;
+    }
+    
+    return nil;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectTableColumn:(NSTableColumn *)tableColumn
+{
+    return NO;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
+{
+    return NO;
+}
+
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
+{
+    VerifyItem* item = verifyItems[row];
+    if(item.enlarge == true)
+    {
+        return 110;
+    }
+    
+    return 40;
+}
+
+- (IBAction)concludiVerificaClick:(id)sender {
+    
+    self->_lblSottoscrittori.stringValue = @"Numero di sottoscrittori";
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:SELECT_FILE_PAGE];
 }
 
 @end

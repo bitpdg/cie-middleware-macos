@@ -2,6 +2,8 @@
 
 #include "disigonsdk.h"
 
+#define MAX_INFO    20
+
 typedef struct verifyInfo_t {
     char name[MAX_LEN * 2];
     char surname[MAX_LEN * 2];
@@ -11,6 +13,11 @@ typedef struct verifyInfo_t {
     int CertRevocStatus;
     bool isSignValid;
     bool isCertValid;
+};
+
+typedef struct verifyInfos_t {
+    verifyInfo_t infos[20];
+    int n_infos;
 };
 
 class CIEVerify

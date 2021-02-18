@@ -30,6 +30,7 @@ uint16_t CIESign::sign(const char* inFilePath, const char* type, const char* pin
 	{
 		ctx = disigon_sign_init();
 
+        /*
 		ret = disigon_set(DISIGON_OPT_LOG_FILE, (void*)"F:\\Projects\\IPZS\\TestFirmaCIE\\log.txt");
 
 		ret = disigon_set(DISIGON_OPT_LOG_LEVEL, (void*)LOG_TYPE_DEBUG);
@@ -37,7 +38,7 @@ uint16_t CIESign::sign(const char* inFilePath, const char* type, const char* pin
 		{
 			throw ret;
 		}
-
+*/
 		ret = disigon_sign_set(ctx, DISIGON_OPT_IAS_INSTANCE, (IAS*)(this->ias));
 		if (ret != 0)
 		{
@@ -121,12 +122,11 @@ uint16_t CIESign::sign(const char* inFilePath, const char* type, const char* pin
 		}
 		else {
 
-			//TODO renderlo case insensitive
 			if ((strstr(inFilePath, "p7m") != NULL) || (strstr(inFilePath, "p7s") != NULL))
 				ret = disigon_sign_set(ctx, DISIGON_OPT_INPUTFILE_TYPE, (void*)DISIGON_FILETYPE_P7M);
-			else
-				ret = disigon_sign_set(ctx, DISIGON_OPT_INPUTFILE_TYPE, (void*)DISIGON_FILETYPE_PLAINTEXT);
-
+            else
+                ret = disigon_sign_set(ctx, DISIGON_OPT_INPUTFILE_TYPE, (void*)DISIGON_FILETYPE_PLAINTEXT);
+            
 			if (ret != 0)
 			{
 				throw ret;

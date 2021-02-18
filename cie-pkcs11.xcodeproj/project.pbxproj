@@ -12,6 +12,13 @@
 		0883C2E6251C94290054055E /* CarouselView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0883C2E1251C94290054055E /* CarouselView.xib */; };
 		0883C2E7251C94290054055E /* CarouselCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 0883C2E2251C94290054055E /* CarouselCard.m */; };
 		461398B8C02047C25F03D065 /* Pods_CIE_ID.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC86202F63F36F82504EC0B3 /* Pods_CIE_ID.framework */; };
+		7649F44225DE65E500A33DAC /* FirmaConCIE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7649F44025DE65E500A33DAC /* FirmaConCIE.cpp */; };
+		7649F44325DE65E500A33DAC /* FirmaConCIE.h in Headers */ = {isa = PBXBuildFile; fileRef = 7649F44125DE65E500A33DAC /* FirmaConCIE.h */; };
+		7649F45625DE6B9700A33DAC /* VerificaConCIE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7649F45425DE6B9700A33DAC /* VerificaConCIE.cpp */; };
+		7649F45725DE6B9700A33DAC /* VerificaConCIE.h in Headers */ = {isa = PBXBuildFile; fileRef = 7649F45525DE6B9700A33DAC /* VerificaConCIE.h */; };
+		7649F46A25DEA69100A33DAC /* VerifyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7649F46925DEA69100A33DAC /* VerifyCell.xib */; };
+		7649F47425DEA6D200A33DAC /* VerifyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7649F47325DEA6D200A33DAC /* VerifyCell.swift */; };
+		7649F47E25DEB30100A33DAC /* VerifyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7649F47D25DEB30100A33DAC /* VerifyItem.swift */; };
 		764F7C4725C3224F0021B789 /* disigonsdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 764F7C3F25C3224F0021B789 /* disigonsdk.h */; };
 		764F7C4825C3224F0021B789 /* CIESign.h in Headers */ = {isa = PBXBuildFile; fileRef = 764F7C4025C3224F0021B789 /* CIESign.h */; };
 		764F7C4925C3224F0021B789 /* CIEEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 764F7C4125C3224F0021B789 /* CIEEngine.h */; };
@@ -259,6 +266,13 @@
 		2F05ABF04FC862DB88E240A2 /* Pods-CIE ID.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CIE ID.release.xcconfig"; path = "Pods/Target Support Files/Pods-CIE ID/Pods-CIE ID.release.xcconfig"; sourceTree = "<group>"; };
 		438D493AABE95B9738D331F7 /* Pods-cie-pkcs11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cie-pkcs11.release.xcconfig"; path = "Pods/Target Support Files/Pods-cie-pkcs11/Pods-cie-pkcs11.release.xcconfig"; sourceTree = "<group>"; };
 		6E9C0B9FE6F0B903268DC6D0 /* Pods-CIE ID.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CIE ID.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CIE ID/Pods-CIE ID.debug.xcconfig"; sourceTree = "<group>"; };
+		7649F44025DE65E500A33DAC /* FirmaConCIE.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FirmaConCIE.cpp; sourceTree = "<group>"; };
+		7649F44125DE65E500A33DAC /* FirmaConCIE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirmaConCIE.h; sourceTree = "<group>"; };
+		7649F45425DE6B9700A33DAC /* VerificaConCIE.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VerificaConCIE.cpp; sourceTree = "<group>"; };
+		7649F45525DE6B9700A33DAC /* VerificaConCIE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerificaConCIE.h; sourceTree = "<group>"; };
+		7649F46925DEA69100A33DAC /* VerifyCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VerifyCell.xib; sourceTree = "<group>"; };
+		7649F47325DEA6D200A33DAC /* VerifyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCell.swift; sourceTree = "<group>"; };
+		7649F47D25DEB30100A33DAC /* VerifyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyItem.swift; sourceTree = "<group>"; };
 		764F7C3425C31E030021B789 /* libcie_sign_sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcie_sign_sdk.a; path = "cie-pkcs11/Sign/libcie_sign_sdk.a"; sourceTree = "<group>"; };
 		764F7C3F25C3224F0021B789 /* disigonsdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disigonsdk.h; sourceTree = "<group>"; };
 		764F7C4025C3224F0021B789 /* CIESign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CIESign.h; sourceTree = "<group>"; };
@@ -579,6 +593,15 @@
 			path = Carousel;
 			sourceTree = "<group>";
 		};
+		7649F46825DEA64400A33DAC /* TableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				7649F46925DEA69100A33DAC /* VerifyCell.xib */,
+				7649F47325DEA6D200A33DAC /* VerifyCell.swift */,
+			);
+			path = TableViewCell;
+			sourceTree = "<group>";
+		};
 		764F7C3E25C3224F0021B789 /* Sign */ = {
 			isa = PBXGroup;
 			children = (
@@ -652,6 +675,7 @@
 		E544F56421BFAFC60038B2CA /* CIE ID */ = {
 			isa = PBXGroup;
 			children = (
+				7649F46825DEA64400A33DAC /* TableViewCell */,
 				76F67E0D25DD295D002AB48D /* Fonts */,
 				0883C2DD251C940E0054055E /* Carousel */,
 				7663CDD72518DF6A00FDC547 /* CieList.h */,
@@ -678,6 +702,7 @@
 				768BE8D625D5356900D62B77 /* BorderedView.swift */,
 				768BE8F225D5671000D62B77 /* PdfPreview.swift */,
 				768BE8FC25D5684B00D62B77 /* MovableImageView.swift */,
+				7649F47D25DEB30100A33DAC /* VerifyItem.swift */,
 			);
 			path = "CIE ID";
 			sourceTree = "<group>";
@@ -753,6 +778,10 @@
 				E5659047211875760039865C /* IAS.h */,
 				E570A7762168986B00658AAF /* PINManager.cpp */,
 				E570A7772168986B00658AAF /* PINManager.h */,
+				7649F44025DE65E500A33DAC /* FirmaConCIE.cpp */,
+				7649F44125DE65E500A33DAC /* FirmaConCIE.h */,
+				7649F45425DE6B9700A33DAC /* VerificaConCIE.cpp */,
+				7649F45525DE6B9700A33DAC /* VerificaConCIE.h */,
 			);
 			path = CSP;
 			sourceTree = "<group>";
@@ -1002,6 +1031,8 @@
 				E5BE7DB220FE853800004389 /* Mechanism.h in Headers */,
 				E5659074211875950039865C /* ASNParser.h in Headers */,
 				E5BE7DC020FE858600004389 /* pkcs11.h in Headers */,
+				7649F44325DE65E500A33DAC /* FirmaConCIE.h in Headers */,
+				7649F45725DE6B9700A33DAC /* VerificaConCIE.h in Headers */,
 				E5659043211864470039865C /* UtilException.h in Headers */,
 				E587E1C421ECA3BE0088B28D /* UUCTextFileReader.h in Headers */,
 				E5BE7DB020FE853800004389 /* InitP11.h in Headers */,
@@ -1274,6 +1305,7 @@
 				E544F56F21BFAFC90038B2CA /* Main.storyboard in Resources */,
 				0883C2E6251C94290054055E /* CarouselView.xib in Resources */,
 				0883C2E5251C94290054055E /* CarouselCard.xib in Resources */,
+				7649F46A25DEA69100A33DAC /* VerifyCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1390,8 +1422,10 @@
 				768BE8D725D5356900D62B77 /* BorderedView.swift in Sources */,
 				E59DCCDF21C3BB7300CE4790 /* IntroViewController.m in Sources */,
 				0883C2E7251C94290054055E /* CarouselCard.m in Sources */,
+				7649F47425DEA6D200A33DAC /* VerifyCell.swift in Sources */,
 				7677F14825D3FB9700A9A8F6 /* DropView.swift in Sources */,
 				7677F1EA25D4777300A9A8F6 /* ChangeView.m in Sources */,
+				7649F47E25DEB30100A33DAC /* VerifyItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1451,6 +1485,7 @@
 				E587E1CA21ECA3BE0088B28D /* UUCProperties.cpp in Sources */,
 				E5087ABF216610D4007063E6 /* UUCProperties.cpp in Sources */,
 				E587E1C221ECA3BE0088B28D /* UUCTextFileReader.cpp in Sources */,
+				7649F44225DE65E500A33DAC /* FirmaConCIE.cpp in Sources */,
 				E5659049211875760039865C /* IAS.cpp in Sources */,
 				E5BE7DB520FE853800004389 /* PKCS11Functions.cpp in Sources */,
 				E5659058211875830039865C /* PCSC.cpp in Sources */,
@@ -1500,6 +1535,7 @@
 				E5BE7DB920FE853800004389 /* Slot.cpp in Sources */,
 				E50A8A0A213BE053006A000D /* AbilitaCIE.mm in Sources */,
 				E5659038211864470039865C /* SyncroMutex.cpp in Sources */,
+				7649F45625DE6B9700A33DAC /* VerificaConCIE.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
