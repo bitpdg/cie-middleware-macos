@@ -72,6 +72,7 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSTableView *tbVerificaInfo;
 @property (weak) IBOutlet NSTextField *lblVerificaPath;
 @property (weak) IBOutlet NSTextField *lblSottoscrittori;
+@property (weak) IBOutlet NSImageView *imgUpload;
 
 
 
@@ -166,6 +167,8 @@ void* hModule;
     [self addSubviewToMainCustomView:_firmaPinView];
     [self addSubviewToMainCustomView:_personalizzaFirmaView];
     [self addSubviewToMainCustomView:_verificaView];
+    
+    [_imgUpload unregisterDraggedTypes];
     
     operation = NO_OP;
     
@@ -382,11 +385,13 @@ CK_RV completedFirmaCallback(int ret)
         {
             lblProgressFirmaPointer.stringValue = @"File firmato con successo";
             imgFirmaOkPointer.hidden = NO;
+            imgFirmaOkPointer.image = [NSImage imageNamed:@"check"];
         }else
         {
             lblProgressFirmaPointer.stringValue = @"Si è verificato un errore durante la firma";
             //TODO impostare immagine errore
-            //imgFirmaOkPointer
+            imgFirmaOkPointer.hidden = NO;
+            imgFirmaOkPointer.image = [NSImage imageNamed:@"cross"];
         }
         
         progressIndicatorPointerFirma.hidden = YES;
@@ -1721,7 +1726,8 @@ CK_RV completedCallback(string& PAN,
     filePath = _lblPathOp.stringValue;
     _filePathSignOp.stringValue = filePath;
     
-    NSString* fileType = [[NSURL URLWithString:filePath] pathExtension];
+    NSString *filePathNoSpaces = [filePath stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString* fileType = [[NSURL URLWithString:filePathNoSpaces] pathExtension];
     
     if([fileType isEqualTo:@"pdf"])
     {
@@ -1768,6 +1774,9 @@ CK_RV completedCallback(string& PAN,
     _lblPadesSub.textColor = NSColor.grayColor;
     _btnProseguiFirmaOp.enabled = YES;
     
+    _pictureCades.image = [NSImage imageNamed:@"p7m"];
+    _picturePades.image = [NSImage imageNamed:@"pdf_gray"];
+    
     operation = FIRMA_CADES;
     _cbFirmaGrafica.state = NSOffState;
 
@@ -1775,7 +1784,9 @@ CK_RV completedCallback(string& PAN,
 }
 
 - (IBAction)PadesClick:(id)sender {
-    NSString* fileType = [[NSURL URLWithString:filePath] pathExtension];
+    
+    NSString *filePathNoSpaces = [filePath stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString* fileType = [[NSURL URLWithString:filePathNoSpaces] pathExtension];
     
     if([fileType isEqualTo:@"pdf"])
     {
@@ -1784,7 +1795,8 @@ CK_RV completedCallback(string& PAN,
         _lblPades.textColor = NSColor.redColor;
         _lblPadesSub.textColor = NSColor.blackColor;
         _btnProseguiFirmaOp.enabled = YES;
-        
+        _pictureCades.image = [NSImage imageNamed:@"p7m_gray"];
+        _picturePades.image = [NSImage imageNamed:@"pdf"];
         operation = FIRMA_PADES;
     }
     //TODO mettere immagine colorata
@@ -1876,6 +1888,7 @@ CK_RV completedCallback(string& PAN,
     operation = NO_OP;
     
     ChangeView *cG = [ChangeView getInstance];
+    NSLog(@"AnnullaFirmaOp");
     [cG showSubView:SELECT_OP_PAGE];
 }
 
@@ -2229,58 +2242,75 @@ CK_RV completedCallback(string& PAN,
                 {
                     verifyInfo_t info = vInfos.infos[i];
                     NSString *name = [NSString stringWithFormat:@"%s %s\n%s", info.name, info.surname, info.cn];
-                    VerifyItem *nameItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:name];
+                    VerifyItem *nameItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"user"] value:name];
                     
                     NSString * signingTime = [[NSString alloc] initWithCString:info.signingTime encoding:NSUTF8StringEncoding];
+                    
                     
                     if(strcmp(info.signingTime, "") == 0)
                     {
                         signingTime = @"Attributo Signing Time non presente";
+                    }else
+                    {
+                        //YYMMGGHHmmSS
+                        NSDateFormatter *objDateFormatter = [[NSDateFormatter alloc] init];
+                        [objDateFormatter setDateFormat:@"yyMMddHHmmss"];
+                        NSDate *date  = [objDateFormatter dateFromString:[signingTime substringToIndex:(signingTime.length - 1)]];
+                        
+                        [objDateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
+                        signingTime= [objDateFormatter stringFromDate:date];
+                        
+                        
                     }
                     
-                    VerifyItem *signingTimeItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:signingTime];
+                    VerifyItem *signingTimeItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"calendar"] value:signingTime];
                     
                     NSString * signValidity = @"La firma non è valida";
-                    
+                    NSImage *signValidityImg = [NSImage imageNamed:@"orange_checkbox"];
                     if(info.isSignValid)
                     {
                         signValidity = @"La firma è valida";
+                        signValidityImg = [NSImage imageNamed:@"blue_checkbox"];
                     }
                     
-                    VerifyItem *signValidtyItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:signValidity];
+                    VerifyItem *signValidtyItem = [[VerifyItem alloc] initWithImage:signValidityImg value:signValidity];
                     
                     
                     NSString * certValidity = @"Il certificato non è valido";
+                    NSImage * certValidityImg = [NSImage imageNamed:@"orange_checkbox"];
                     if(info.isCertValid)
                     {
                         certValidity = @"Il certificato è valido";
+                        certValidityImg = [NSImage imageNamed:@"blue_checkbox"];
                     }
                     
-                    VerifyItem *certValidityItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:certValidity];
+                    VerifyItem *certValidityItem = [[VerifyItem alloc] initWithImage:certValidityImg value:certValidity];
                     
                     
                     NSString * certStatus = @"Servizio di revoca non raggiungibile";
-                    
+                    NSImage * certStatusImg = [NSImage imageNamed:@"orange_checkbox"];
                     switch(info.CertRevocStatus)
                     {
                         case REVOCATION_STATUS_GOOD:
-                            certValidity = @"Il certificato non è stato revocato";
+                            certStatus = @"Il certificato non è stato revocato";
+                            certStatusImg = [NSImage imageNamed:@"blue_checkbox"];
                             break;
                         case REVOCATION_STATUS_REVOKED:
-                            certValidity = @"Il certificato è stato revocato";
+                            certStatus = @"Il certificato è stato revocato";
                             break;
                         case REVOCATION_STATUS_SUSPENDED:
-                            certValidity = @"Il certificato è stato sospeso";
+                            certStatus = @"Il certificato è stato sospeso";
                             break;
                         default:
                             break;
                     }
                     
-                    VerifyItem *certStatusItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:certStatus];
+                    VerifyItem *certStatusItem = [[VerifyItem alloc] initWithImage:certStatusImg value:certStatus];
                     
                     
-                    NSString * cadn = [[NSString alloc] initWithCString:info.cadn encoding:NSUTF8StringEncoding];
-                    VerifyItem *cadnItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"icona_aiuto"] value:cadn];
+                    NSString *cadn = [[NSString alloc] initWithCString:info.cadn encoding:NSUTF8StringEncoding];
+                    NSImage *cadnImg = [NSImage imageNamed:@"medal"];
+                    VerifyItem *cadnItem = [[VerifyItem alloc] initWithImage:cadnImg value:cadn];
                     //[cadnItem setEnlarge:true];
                     cadnItem.enlarge = true;
                     

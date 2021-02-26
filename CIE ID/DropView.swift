@@ -74,9 +74,8 @@ class DropView: NSView {
 
     override func draggingEnded(_ sender: NSDraggingInfo) {
         self.layer?.backgroundColor = NSColor.white.cgColor
+        //ChangeView.getInstance().showSubView(viewIndex.SELECT_OP_PAGE)
 
-        ChangeView.getInstance().showSubView(viewIndex.SELECT_OP_PAGE)
-        
     }
 
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
@@ -87,7 +86,6 @@ class DropView: NSView {
         self.filePath = path
         
         self.goToSelectOpPage(path: path)
-        
         return true
     }
     
