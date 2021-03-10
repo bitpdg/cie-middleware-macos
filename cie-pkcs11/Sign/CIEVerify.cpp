@@ -16,8 +16,10 @@ long CIEVerify::verify(const char* input_file, VERIFY_RESULT* verifyResult)
 			long ret;
 
 			ctx = disigon_verify_init();
-
+            
+#if 0
 			ret = disigon_set(DISIGON_OPT_LOG_LEVEL, (void*)LOG_TYPE_DEBUG);
+#endif
 
 			ret = disigon_verify_set(ctx, DISIGON_OPT_INPUTFILE, (void*)input_file);
 			if (ret != 0)

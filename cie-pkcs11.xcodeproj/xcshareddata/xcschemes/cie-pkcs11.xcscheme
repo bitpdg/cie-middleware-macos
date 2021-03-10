@@ -40,10 +40,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <PathRunnable
-         runnableDebuggingMode = "0"
-         FilePath = "/Users/piero/Desktop/Bit4id/IPZS/ciesign/CIE_ID_Sign_Lib/example_test/main">
-      </PathRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E544F56221BFAFC60038B2CA"
+            BuildableName = "CIE ID.app"
+            BlueprintName = "CIE ID"
+            ReferencedContainer = "container:cie-pkcs11.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

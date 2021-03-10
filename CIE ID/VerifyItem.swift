@@ -11,10 +11,11 @@ import Foundation
 @objc
 class VerifyItem : NSObject{
      
-    private (set) var value : String
     private (set) var img : NSImage
     @objc
     var enlarge = false
+    @objc
+    var value : String
     
     @objc
     init(image: NSImage, value : String)

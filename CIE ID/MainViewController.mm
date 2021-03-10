@@ -73,6 +73,7 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSTextField *lblVerificaPath;
 @property (weak) IBOutlet NSTextField *lblSottoscrittori;
 @property (weak) IBOutlet NSImageView *imgUpload;
+@property (weak) IBOutlet NSButton *btnCreaFirma;
 
 
 
@@ -1726,6 +1727,25 @@ CK_RV completedCallback(string& PAN,
     filePath = _lblPathOp.stringValue;
     _filePathSignOp.stringValue = filePath;
     
+    _btnProseguiFirmaOp.enabled = NO;
+    _lblCades.textColor = NSColor.grayColor;
+    _lblCadesSub.textColor = NSColor.grayColor;
+    _lblPades.textColor = NSColor.grayColor;
+    _lblPadesSub.textColor = NSColor.grayColor;
+    _pictureCades.image = [NSImage imageNamed:@"p7m_gray"];
+    _picturePades.image = [NSImage imageNamed:@"pdf_gray"];
+    _cbFirmaGrafica.enabled = NO;
+    _cbFirmaGrafica.state = NSOffState;
+    
+    
+    NSColor *color = [NSColor grayColor];
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[_cbFirmaGrafica attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
+    [_cbFirmaGrafica setAttributedTitle:colorTitle];
+    
+    operation = NO_OP;
+    
     NSString *filePathNoSpaces = [filePath stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString* fileType = [[NSURL URLWithString:filePathNoSpaces] pathExtension];
     
@@ -1773,6 +1793,11 @@ CK_RV completedCallback(string& PAN,
     _lblPades.textColor = NSColor.grayColor;
     _lblPadesSub.textColor = NSColor.grayColor;
     _btnProseguiFirmaOp.enabled = YES;
+    NSColor *color = [NSColor grayColor];
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[_cbFirmaGrafica attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
+    [_cbFirmaGrafica setAttributedTitle:colorTitle];
     
     _pictureCades.image = [NSImage imageNamed:@"p7m"];
     _picturePades.image = [NSImage imageNamed:@"pdf_gray"];
@@ -1788,18 +1813,26 @@ CK_RV completedCallback(string& PAN,
     NSString *filePathNoSpaces = [filePath stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString* fileType = [[NSURL URLWithString:filePathNoSpaces] pathExtension];
     
+
+    
     if([fileType isEqualTo:@"pdf"])
     {
         _lblCades.textColor = NSColor.grayColor;
         _lblCadesSub.textColor = NSColor.grayColor;
         _lblPades.textColor = NSColor.redColor;
         _lblPadesSub.textColor = NSColor.blackColor;
+        NSColor *color = [NSColor blackColor];
+        NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[_cbFirmaGrafica attributedTitle]];
+        NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+        [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
+        [_cbFirmaGrafica setAttributedTitle:colorTitle];
+        
         _btnProseguiFirmaOp.enabled = YES;
         _pictureCades.image = [NSImage imageNamed:@"p7m_gray"];
         _picturePades.image = [NSImage imageNamed:@"pdf"];
         operation = FIRMA_PADES;
+        
     }
-    //TODO mettere immagine colorata
     
 }
 - (IBAction)cbFirmaGraficaClick:(id)sender {
@@ -1860,8 +1893,6 @@ CK_RV completedCallback(string& PAN,
         NSFileManager *fileManager = [NSFileManager defaultManager];
         if(![fileManager fileExistsAtPath: signImgPath])
         {
-            NSLog(@"Firma grafica non presente, verrà creata");
-            
             [self drawText:[selectedCie getName].capitalizedString pathToFile:signImgPath];
         }
         
@@ -1916,6 +1947,13 @@ CK_RV completedCallback(string& PAN,
     _progressFirma.hidden = YES;
     _lblProgressFirma.hidden = YES;
     
+    for(int i = 9; i < 13; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
     ChangeView *cG = [ChangeView getInstance];
     if(_cbFirmaGrafica.state == NSOnState)
     {
@@ -1928,13 +1966,7 @@ CK_RV completedCallback(string& PAN,
 
 - (IBAction)firmaClick:(id)sender {
     
-    _lblInsertPin.hidden = YES;
-    _cvInsertPin.hidden = YES;
-    _btnConcludiFirma.hidden = YES;
-    _btnFirma.enabled = NO;
-    _btnAnnullaFirma.enabled = NO;
-    _progressFirma.hidden = NO;
-    _lblProgressFirma.hidden = NO;
+
     //_btnFirmaElettronica.enabled = NO;
     
     NSString* pin = @"";
@@ -1970,11 +2002,14 @@ CK_RV completedCallback(string& PAN,
     }
     
     NSSavePanel *panel = [NSSavePanel savePanel];
+    NSString* fileName = [filePath lastPathComponent];
+    NSString *saveFileName = [NSString stringWithFormat:@"%@%@",[fileName stringByDeletingPathExtension], @"-signed"];
     [panel setMessage:@"Scegliere dove salvare il file firmato"]; // Message inside modal window
     [panel setExtensionHidden:NO];
     [panel setCanCreateDirectories:YES];
     [panel setTitle:@"Salva file firmato"];
     [panel setAllowsOtherFileTypes:NO];
+    [panel setNameFieldStringValue:saveFileName];
 
     if(operation == FIRMA_PADES)
     {
@@ -1983,6 +2018,14 @@ CK_RV completedCallback(string& PAN,
             
             if (result == NSModalResponseOK)
             {
+                
+                _lblInsertPin.hidden = YES;
+                _cvInsertPin.hidden = YES;
+                _btnConcludiFirma.hidden = YES;
+                _btnFirma.enabled = NO;
+                _btnAnnullaFirma.enabled = NO;
+                _progressFirma.hidden = NO;
+                _lblProgressFirma.hidden = NO;
                 NSString *outPath = [[panel URL] path];
                 
                 if(_cbFirmaGrafica.state == NSOnState)
@@ -2003,6 +2046,14 @@ CK_RV completedCallback(string& PAN,
         [panel beginWithCompletionHandler:^(NSInteger result) {
             if (result == NSModalResponseOK)
             {
+                _lblInsertPin.hidden = YES;
+                _cvInsertPin.hidden = YES;
+                _btnConcludiFirma.hidden = YES;
+                _btnFirma.enabled = NO;
+                _btnAnnullaFirma.enabled = NO;
+                _progressFirma.hidden = NO;
+                _lblProgressFirma.hidden = NO;
+                
                 NSString *outPath = [[panel URL] path];
                 
                 [self firmaConCie:sender inputFilePath:filePath outFilePath:outPath signImagePath:NULL pin:pin x:0.0 y:0.0 w:0.0 h:0.0 fileType:@"p7m"];
@@ -2126,9 +2177,11 @@ CK_RV completedCallback(string& PAN,
     if([selectedCie getCustomSign])
     {
         _lblFirmaPersonalizata.stringValue = @"Una tua firma grafica personalizzata è già stata caricata. Vuoi aggiornarla?";
+        _btnCreaFirma.enabled = YES;
     }else
     {
         _lblFirmaPersonalizata.stringValue = @"Abbiamo creato per te una firma grafica, ma se preferisci puoi personalizzarla. Questo passaggio non è indispensabile, ma ti consentirà di dare un tocco personale ai documenti firmati.";
+        _btnCreaFirma.enabled = NO;
     }
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -2150,6 +2203,41 @@ CK_RV completedCallback(string& PAN,
     
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FILE_PAGE];
+}
+
+- (IBAction)creaFirmaClick:(id)sender {
+    
+    Cie* selectedCie = [self.carouselView getSelectedCard];
+    NSString* signImgPath = [self getSignImagePath:[selectedCie getSerialNumber]];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    NSError *error = nil;
+    
+    if ([fileManager fileExistsAtPath:signImgPath] == YES) {
+        [fileManager removeItemAtPath:signImgPath error:&error];
+    }
+    
+    [self drawText:[selectedCie getName].capitalizedString pathToFile:signImgPath];
+
+    _lblFirmaPersonalizata.stringValue = @"Abbiamo creato per te una firma grafica, ma se preferisci puoi personalizzarla. Questo passaggio non è indispensabile, ma ti consentirà di dare un tocco personale ai documenti firmati.";
+    [_btnPersonalizza setTitle:@"Personalizza"];
+    [_lblPersonalizzata setHidden:YES];
+    [_lblFirmaPersonalizzataSub setHidden:NO];
+
+    _signImageView.image = [[NSImage alloc] initWithContentsOfFile:signImgPath];
+    
+    [selectedCie customSignSet:false];
+    
+    Cie* cie = [[cieList getDictionary] valueForKey:[selectedCie getPan]];
+    [cie customSignSet:false];
+    
+    [NSUserDefaults.standardUserDefaults setObject:[cieList getData] forKey:@"cieDictionary"];
+    [NSUserDefaults.standardUserDefaults synchronize];
+    
+    
+    _btnCreaFirma.enabled = NO;
+    
 }
 
 - (IBAction)selectFirmaSignClick:(id)sender {
@@ -2180,7 +2268,6 @@ CK_RV completedCallback(string& PAN,
             {
                 _signImageView.image = [[NSImage alloc] initWithContentsOfFile:signImgPath];
                 
-                //tenere traccia immagine custom
                 [selectedCie customSignSet:true];
                 
                 Cie* cie = [[cieList getDictionary] valueForKey:[selectedCie getPan]];
@@ -2194,13 +2281,13 @@ CK_RV completedCallback(string& PAN,
                 
                 [_lblPersonalizzata setHidden:NO];
                 [_lblFirmaPersonalizzataSub setHidden:YES];
+                
+                _btnCreaFirma.enabled = YES;
             }
         }
         
     }];
 }
-
-
 
 -(void)verificaConCie: (NSControl*) sender inputFilePath:(NSString*)inPath
 {
@@ -2259,8 +2346,6 @@ CK_RV completedCallback(string& PAN,
                         
                         [objDateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
                         signingTime= [objDateFormatter stringFromDate:date];
-                        
-                        
                     }
                     
                     VerifyItem *signingTimeItem = [[VerifyItem alloc] initWithImage:[NSImage imageNamed:@"calendar"] value:signingTime];
@@ -2270,18 +2355,17 @@ CK_RV completedCallback(string& PAN,
                     if(info.isSignValid)
                     {
                         signValidity = @"La firma è valida";
-                        signValidityImg = [NSImage imageNamed:@"blue_checkbox"];
+                        signValidityImg = [NSImage imageNamed:@"green_checkbox"];
                     }
                     
                     VerifyItem *signValidtyItem = [[VerifyItem alloc] initWithImage:signValidityImg value:signValidity];
-                    
                     
                     NSString * certValidity = @"Il certificato non è valido";
                     NSImage * certValidityImg = [NSImage imageNamed:@"orange_checkbox"];
                     if(info.isCertValid)
                     {
                         certValidity = @"Il certificato è valido";
-                        certValidityImg = [NSImage imageNamed:@"blue_checkbox"];
+                        certValidityImg = [NSImage imageNamed:@"green_checkbox"];
                     }
                     
                     VerifyItem *certValidityItem = [[VerifyItem alloc] initWithImage:certValidityImg value:certValidity];
@@ -2293,7 +2377,7 @@ CK_RV completedCallback(string& PAN,
                     {
                         case REVOCATION_STATUS_GOOD:
                             certStatus = @"Il certificato non è stato revocato";
-                            certStatusImg = [NSImage imageNamed:@"blue_checkbox"];
+                            certStatusImg = [NSImage imageNamed:@"green_checkbox"];
                             break;
                         case REVOCATION_STATUS_REVOKED:
                             certStatus = @"Il certificato è stato revocato";
@@ -2301,12 +2385,14 @@ CK_RV completedCallback(string& PAN,
                         case REVOCATION_STATUS_SUSPENDED:
                             certStatus = @"Il certificato è stato sospeso";
                             break;
+                        case REVOCATION_STATUS_UNKNOWN:
+                            certValidityItem.value = @"Certificato non verificato";
+                            break;
                         default:
                             break;
                     }
                     
                     VerifyItem *certStatusItem = [[VerifyItem alloc] initWithImage:certStatusImg value:certStatus];
-                    
                     
                     NSString *cadn = [[NSString alloc] initWithCString:info.cadn encoding:NSUTF8StringEncoding];
                     NSImage *cadnImg = [NSImage imageNamed:@"medal"];
@@ -2330,6 +2416,14 @@ CK_RV completedCallback(string& PAN,
                     [cG showSubView:VERIFICA_PAGE];
                 });
             }
+        }else if(ret == DISIGON_ERROR_INVALID_FILE)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [sender setEnabled:YES];
+            });
+            [self showMessage:@"Il file selezionato non è un file valido. E' possibile verificare solo file con estensione .p7m o.pdf" withTitle:@"Errore nella verifica" exitAfter:false];
+            ChangeView *cG = [ChangeView getInstance];
+            [cG showSubView:SELECT_FILE_PAGE];
         }else
         {
             dispatch_async(dispatch_get_main_queue(), ^{

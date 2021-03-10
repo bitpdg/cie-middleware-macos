@@ -12,14 +12,6 @@ CIESign::CIESign(IAS *ias){
 
 uint16_t CIESign::sign(const char* inFilePath, const char* type, const char* pin, int page, float x, float y, float w, float h, const char* imagePathFile,const char* outFilePath)
 {
-	/*
-		url e outFilePath deve avere il path assoluto
-		
-		verificare a cosa serve qua dentro id servizi
-
-		Il chiamante dovr� passare il path dell0'immagine e verificare se
-		� stata aggiunta un'immagine custom o meno
-	*/
 
 	uint16_t response;
 
