@@ -35,7 +35,8 @@ typedef NS_ENUM(NSUInteger, viewIndex) {
     FIRMA_PDF_PREVIEW,
     FIRMA_PIN_PAGE,
     PERSONALIZZA_FIRMA_PAGE,
-    VERIFICA_PAGE
+    VERIFICA_PAGE,
+    IMPOSTAZIONI
 };
 
 + (ChangeView *)getInstance;

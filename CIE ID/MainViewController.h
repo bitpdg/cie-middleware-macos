@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* firmaPinView;
 @property IBOutlet NSView* personalizzaFirmaView;
 @property IBOutlet NSView* verificaView;
+@property IBOutlet NSView *impostazioniView;
 
 @property IBOutlet NSTextField* labelHelp;
 @property IBOutlet WKWebView* helpWebView;
@@ -67,6 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property IBOutlet NSView* helpButtonView;
 @property IBOutlet NSView* infoButtonView;
 @property IBOutlet NSView* firmaElettronicaButtonView;
+@property IBOutlet NSView* impostazioniButtonView;
 
 
 @property (weak) IBOutlet CarouselView *carouselView;

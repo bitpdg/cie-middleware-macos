@@ -13,12 +13,12 @@ extern "C" {
     CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos);
 }
 
-CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos)
+CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos, const char* proxyAddress, int proxyPort, const char* usrPass)
 {
     VERIFY_RESULT verifyResult;
     CIEVerify* verifier = new CIEVerify();
 
-    verifier->verify(inFilePath, (VERIFY_RESULT*)&verifyResult);
+    verifier->verify(inFilePath, (VERIFY_RESULT*)&verifyResult, proxyAddress, proxyPort, usrPass);
     
     if (verifyResult.nErrorCode == 0)
     {

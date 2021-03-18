@@ -26,7 +26,6 @@ class CIEVerify
 		CIEVerify();
 		~CIEVerify();
 
-		long verify(const char* input_file, VERIFY_RESULT* verifyResult);
-
+    long verify(const char* input_file, VERIFY_RESULT* verifyResult, const char* proxy_address, int proxy_port, const char* userPass);
 };
 

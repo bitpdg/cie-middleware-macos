@@ -7,6 +7,8 @@
 //
 
 #import "MainViewController.h"
+#import <IOKit/IOKitLib.h>
+#import <CommonCrypto/CommonDigest.h>
 
 // directive for PKCS#11
 #include "../cie-pkcs11/PKCS11/cryptoki.h"
@@ -136,13 +138,26 @@ void* hModule;
 - (void)loadView {
     [super loadView];
     
-    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, _firmaPinView, _personalizzaFirmaView, _verificaView, nil];
+    viewArray = [[NSArray alloc] initWithObjects:_homeFirstPageView, _homeSecondPageView, _homeThirdPageView, _homeFourthPageView, _cambioPINPageView, _cambioPINOKPageView, _sbloccoPageView, _sbloccoOKPageView, _helpPageView, _infoPageView, _selectFilePageView, _selectOperationView,_firmaOperationView, _firmaPrevView, _firmaPinView, _personalizzaFirmaView, _verificaView, _impostazioniView, nil];
     
     ChangeView *cG = [ChangeView getInstance];
     cG.viewArray = viewArray;
     
     [self showHomeFirstPage];
     
+}
+
+- (NSString *)getSystemUUID {
+    io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,IOServiceMatching("IOPlatformExpertDevice"));
+    if (!platformExpert)
+        return nil;
+
+    CFTypeRef serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert,CFSTR(kIOPlatformUUIDKey),kCFAllocatorDefault, 0);
+    IOObjectRelease(platformExpert);
+    if (!serialNumberAsCFString)
+        return nil;
+
+    return (__bridge_transfer NSString *)(serialNumberAsCFString);
 }
 
 - (void) viewDidLoad
@@ -168,10 +183,16 @@ void* hModule;
     [self addSubviewToMainCustomView:_firmaPinView];
     [self addSubviewToMainCustomView:_personalizzaFirmaView];
     [self addSubviewToMainCustomView:_verificaView];
+    [self addSubviewToMainCustomView:_impostazioniView];
+    
     
     [_imgUpload unregisterDraggedTypes];
     
     operation = NO_OP;
+    
+    string systemUUID = [[self getSystemUUID] UTF8String];
+    NSLog(@"%@", [self getSystemUUID]);
+    
     
     if(([NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
     {
@@ -569,6 +590,12 @@ CK_RV completedCallback(string& PAN,
     _lblSubFirmaHome.stringValue = @"Carta di Identità Elettrinica abbinata correttamente";
     [self showHomeFirstPage];
 }
+
+- (IBAction)impostazioni:(id)sender {
+    [self showImpostazioniPage];
+}
+
+
 
 - (IBAction)firmaElettronica:(id)sender {
     [self showFirmaPinView];
@@ -1130,6 +1157,26 @@ CK_RV completedCallback(string& PAN,
         [self showHomeFourthPage];
     }
 }
+
+-(void) showImpostazioniPage
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+    self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.impostazioniButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+    
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:IMPOSTAZIONI];
+        
+    });
+
+}
+
 
 -(void) showFirmaElettronica
 {
