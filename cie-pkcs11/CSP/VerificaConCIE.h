@@ -12,7 +12,7 @@
 #include "AbilitaCIE.h"
 #include "../Sign/CIEVerify.h"
 
-typedef CK_RV (*verificaConCIEfn)(const char* inFilePath, verifyInfos_t* vInfos);
-//typedef CK_RV (*verificaConCIEfn)(const char* inFilePath, verifyInfos_t* vInfos, const char* proxyAddress, int proxyPort, const char* usrPass);
+//typedef CK_RV (*verificaConCIEfn)(const char* inFilePath, verifyInfos_t* vInfos);
+typedef CK_RV (*verificaConCIEfn)(const char* inFilePath, verifyInfos_t* vInfos, const char* proxyAddress, int proxyPort, const char* usrPass);
 
 #endif /* VerificaConCIE_h */

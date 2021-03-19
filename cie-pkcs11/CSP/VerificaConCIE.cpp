@@ -10,7 +10,7 @@
 #include "../PKCS11/PKCS11Functions.h"
 
 extern "C" {
-    CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos);
+    CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos, const char* proxyAddress, int proxyPort, const char* usrPass);
 }
 
 CK_RV CK_ENTRY verificaConCIE(const char* inFilePath, verifyInfos_t* vInfos, const char* proxyAddress, int proxyPort, const char* usrPass)
