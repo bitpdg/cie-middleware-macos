@@ -2571,6 +2571,14 @@ CK_RV completedCallback(string& PAN,
         [self showMessage:@"Indirizzo o porta del proxy mancante" withTitle:@"Informazioni proxy mancanti" exitAfter:false];
         return;
     }
+
+    NSCharacterSet* nonNumbers = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    NSRange r = [_txtPorta.stringValue rangeOfCharacterFromSet: nonNumbers];
+    if(r.location != NSNotFound)
+    {
+        [self showMessage:@"Il campo porta deve contenere solo numeri" withTitle:@"Porta del proxy errata" exitAfter:false];
+        return;
+    }
     
     [_txtPorta setEnabled:FALSE];
     [_txtProxyAddr setEnabled:FALSE];
