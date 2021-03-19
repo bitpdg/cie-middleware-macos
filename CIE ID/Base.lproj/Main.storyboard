@@ -286,13 +286,16 @@
                         <outlet property="btnCreaFirma" destination="6wS-h4-Bb9" id="2Y0-F4-Qj3"/>
                         <outlet property="btnFirma" destination="c0D-Hk-2y4" id="d5X-Fk-PqB"/>
                         <outlet property="btnFirmaElettronica" destination="Si6-kt-v6v" id="rHk-iQ-9Ro"/>
+                        <outlet property="btnModificaProxy" destination="6OX-M8-VjL" id="Jsc-uT-qHV"/>
                         <outlet property="btnPersonalizza" destination="f5J-jt-oEu" id="rer-cH-CMw"/>
                         <outlet property="btnProseguiFirmaOp" destination="c12-y9-3mW" id="PoT-9G-aQ8"/>
+                        <outlet property="btnSalvaProxy" destination="yGt-bn-tAH" id="7VD-nf-2w8"/>
                         <outlet property="cambioPINButtonView" destination="lrL-iW-R0U" id="xaW-Ke-Qi1"/>
                         <outlet property="cambioPINOKPageView" destination="gbY-3C-V3N" id="xZV-6g-SgL"/>
                         <outlet property="cambioPINPageView" destination="Qux-KY-phF" id="XzU-be-vxC"/>
                         <outlet property="carouselView" destination="bbe-RZ-J3q" id="OCw-5F-n95"/>
                         <outlet property="cbFirmaGrafica" destination="WNU-mg-OhD" id="nPc-WP-nel"/>
+                        <outlet property="cbMostraPsw" destination="jDo-KO-WPc" id="OTm-PI-lBY"/>
                         <outlet property="cvInsertPin" destination="WtP-No-p2l" id="kVb-fD-nWv"/>
                         <outlet property="filePathSignOp" destination="tkc-yT-lxO" id="UM5-1F-WLy"/>
                         <outlet property="firmaElettronicaButtonView" destination="nSP-6F-JnT" id="Aem-7E-Rrv"/>
@@ -340,6 +343,7 @@
                         <outlet property="personalizzaFirmaView" destination="UPo-st-jEA" id="g5r-eY-dd5"/>
                         <outlet property="pictureCades" destination="f2G-iS-RTD" id="4LN-hr-Ji4"/>
                         <outlet property="picturePades" destination="i2O-ZK-HSZ" id="Cnp-Nf-nDd"/>
+                        <outlet property="plainPassword" destination="smq-5C-rHv" id="ds2-Rn-bBx"/>
                         <outlet property="prevImageView" destination="edY-Ll-zge" id="tWx-76-0WM"/>
                         <outlet property="progressFirma" destination="Tlr-TF-D7E" id="TGR-xD-lHV"/>
                         <outlet property="progressIndicator" destination="QaF-ot-ZLo" id="FaV-L5-cRP"/>
@@ -360,6 +364,10 @@
                         <outlet property="textFieldPIN" destination="itc-nx-2Ki" id="DsB-ek-Jc5"/>
                         <outlet property="textFieldPUK" destination="OxO-IO-sF8" id="yjY-De-fYL"/>
                         <outlet property="tutorialButtonView" destination="aoW-Zr-NId" id="lC5-8q-MnC"/>
+                        <outlet property="txtPassword" destination="BiQ-Qq-Gvy" id="2rI-ez-KGC"/>
+                        <outlet property="txtPorta" destination="cR3-kg-FJ7" id="wLH-mm-sDa"/>
+                        <outlet property="txtProxyAddr" destination="erT-fv-xyh" id="oaX-gd-WoH"/>
+                        <outlet property="txtUsername" destination="4UF-Ln-42c" id="kVB-FZ-KbX"/>
                         <outlet property="verificaView" destination="n3W-BK-gm8" id="pWN-fg-CsX"/>
                         <outlet property="viewFirmaSelectOp" destination="lax-5E-YUO" id="XXi-wE-zMc"/>
                     </connections>
@@ -3451,7 +3459,7 @@ DQ
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                     <connections>
-                                        <action selector="concludiVerificaClick:" target="XfG-lQ-9wD" id="G0A-L7-UgA"/>
+                                        <action selector="salvaProxyInfo:" target="XfG-lQ-9wD" id="WW9-JX-wJE"/>
                                     </connections>
                                 </button>
                                 <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6OX-M8-VjL" customClass="FlatButton" customModule="FlatButton">
@@ -3482,7 +3490,7 @@ DQ
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                     <connections>
-                                        <action selector="concludiVerificaClick:" target="XfG-lQ-9wD" id="iWQ-QM-Y2E"/>
+                                        <action selector="modificaProxyInfo:" target="XfG-lQ-9wD" id="vJg-5P-WCw"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -3605,6 +3613,34 @@ DQ
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jDo-KO-WPc">
+                                    <rect key="frame" x="261" y="22" width="126" height="18"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="14" id="cS5-w2-ge7"/>
+                                        <constraint firstAttribute="width" constant="122" id="uwe-nT-lHP"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="check" title="Mostra password" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zWR-y6-IBI">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="mostraPassword:" target="XfG-lQ-9wD" id="dOJ-zf-IOq"/>
+                                    </connections>
+                                </button>
+                                <textField hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="smq-5C-rHv">
+                                    <rect key="frame" x="20" y="21" width="205" height="21"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="21" id="jPc-Ry-U0s"/>
+                                        <constraint firstAttribute="height" constant="21" id="p7T-ih-0B5"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="205" id="yZw-ri-nc3"/>
+                                        <constraint firstAttribute="width" constant="205" id="zpF-dP-9b3"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="inK-bR-p0Q">
+                                        <font key="font" metaFont="system"/>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                             <constraints>
                                 <constraint firstItem="cR3-kg-FJ7" firstAttribute="leading" secondItem="erT-fv-xyh" secondAttribute="trailing" constant="90" id="2Gy-2p-KBF"/>
@@ -3612,8 +3648,11 @@ DQ
                                 <constraint firstItem="BiQ-Qq-Gvy" firstAttribute="leading" secondItem="gJm-NG-UpR" secondAttribute="leading" constant="20" id="BzR-LJ-gpQ"/>
                                 <constraint firstItem="EU0-xK-0b8" firstAttribute="top" secondItem="erT-fv-xyh" secondAttribute="bottom" constant="14" id="Cfm-8x-d42"/>
                                 <constraint firstItem="kDU-XF-0l0" firstAttribute="top" secondItem="4UF-Ln-42c" secondAttribute="bottom" constant="8" id="Jzm-OJ-I8V"/>
+                                <constraint firstItem="jDo-KO-WPc" firstAttribute="leading" secondItem="BiQ-Qq-Gvy" secondAttribute="trailing" constant="38" id="UFr-1K-veg"/>
                                 <constraint firstItem="BiQ-Qq-Gvy" firstAttribute="top" secondItem="kDU-XF-0l0" secondAttribute="bottom" constant="2" id="UWv-ma-noP"/>
+                                <constraint firstAttribute="bottom" secondItem="jDo-KO-WPc" secondAttribute="bottom" constant="24" id="WMm-m8-Mp9"/>
                                 <constraint firstItem="kDU-XF-0l0" firstAttribute="leading" secondItem="gJm-NG-UpR" secondAttribute="leading" constant="20" id="XKb-mm-xd5"/>
+                                <constraint firstAttribute="bottom" secondItem="smq-5C-rHv" secondAttribute="bottom" constant="21" id="Xcf-S7-AnW"/>
                                 <constraint firstItem="erT-fv-xyh" firstAttribute="top" secondItem="WNB-uD-1iu" secondAttribute="bottom" constant="8" id="Xen-m5-ZGw"/>
                                 <constraint firstItem="WNB-uD-1iu" firstAttribute="leading" secondItem="gJm-NG-UpR" secondAttribute="leading" constant="20" id="YXB-xC-DOM"/>
                                 <constraint firstAttribute="bottom" secondItem="BiQ-Qq-Gvy" secondAttribute="bottom" constant="20" id="adG-5b-MVw"/>
@@ -3625,6 +3664,7 @@ DQ
                                 <constraint firstItem="cR3-kg-FJ7" firstAttribute="top" secondItem="WMl-qw-GdG" secondAttribute="bottom" constant="7" id="qwC-Ob-aYp"/>
                                 <constraint firstAttribute="width" constant="433" id="sUr-jn-e8K"/>
                                 <constraint firstItem="4UF-Ln-42c" firstAttribute="top" secondItem="EU0-xK-0b8" secondAttribute="bottom" constant="8" id="tCY-Ti-9lv"/>
+                                <constraint firstItem="smq-5C-rHv" firstAttribute="leading" secondItem="gJm-NG-UpR" secondAttribute="leading" constant="20" id="te2-a6-raM"/>
                             </constraints>
                         </customView>
                     </subviews>

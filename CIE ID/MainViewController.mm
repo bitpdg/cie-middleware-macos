@@ -9,20 +9,20 @@
 #import "MainViewController.h"
 #import <IOKit/IOKitLib.h>
 #import <CommonCrypto/CommonDigest.h>
+#import "ProxyInfoManager.h"
 
-// directive for PKCS#11
-#include "../cie-pkcs11/PKCS11/cryptoki.h"
 #import "PINNoticeViewController.h"
 #import "CieList.h"
 #import "Cie.h"
 #import "ChangeView.h"
 #import "CIE_ID-Swift.h"
+#include "../cie-pkcs11/Cryptopp/aes.h"
 
+// directive for PKCS#11
+#include "../cie-pkcs11/PKCS11/cryptoki.h"
 #include <memory.h>
 #include <time.h>
 #include <dlfcn.h>
-
-
 #include "../cie-pkcs11/CSP/AbilitaCIE.h"
 #include "../cie-pkcs11/CSP/PINManager.h"
 #include "../cie-pkcs11/Sign/CIEVerify.h"
@@ -76,8 +76,15 @@ CK_FUNCTION_LIST_PTR g_pFuncList;
 @property (weak) IBOutlet NSTextField *lblSottoscrittori;
 @property (weak) IBOutlet NSImageView *imgUpload;
 @property (weak) IBOutlet NSButton *btnCreaFirma;
+@property (weak) IBOutlet NSTextField *txtProxyAddr;
+@property (weak) IBOutlet NSTextField *txtUsername;
+@property (weak) IBOutlet NSSecureTextField *txtPassword;
+@property (weak) IBOutlet NSTextField *plainPassword;
 
-
+@property (weak) IBOutlet NSTextField *txtPorta;
+@property (weak) IBOutlet NSButton *cbMostraPsw;
+@property (weak) IBOutlet NSButton *btnSalvaProxy;
+@property (weak) IBOutlet NSButton *btnModificaProxy;
 
 
 @property (weak) IBOutlet NSLayoutConstraint *abbinaButtonWhenAnnullaVisible;
@@ -90,7 +97,6 @@ typedef NS_ENUM(NSUInteger, signOp) {
     FIRMA_CADES,
     FIRMA_PADES,
 };
-
 
 
 @end
@@ -147,19 +153,6 @@ void* hModule;
     
 }
 
-- (NSString *)getSystemUUID {
-    io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,IOServiceMatching("IOPlatformExpertDevice"));
-    if (!platformExpert)
-        return nil;
-
-    CFTypeRef serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert,CFSTR(kIOPlatformUUIDKey),kCFAllocatorDefault, 0);
-    IOObjectRelease(platformExpert);
-    if (!serialNumberAsCFString)
-        return nil;
-
-    return (__bridge_transfer NSString *)(serialNumberAsCFString);
-}
-
 - (void) viewDidLoad
 {
     [super viewDidLoad];
@@ -190,10 +183,7 @@ void* hModule;
     
     operation = NO_OP;
     
-    string systemUUID = [[self getSystemUUID] UTF8String];
-    NSLog(@"%@", [self getSystemUUID]);
-    
-    
+
     if(([NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
     {
          
@@ -1161,17 +1151,64 @@ CK_RV completedCallback(string& PAN,
 -(void) showImpostazioniPage
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-    self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
-    self.impostazioniButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
-    
-    ChangeView *cG = [ChangeView getInstance];
-    [cG showSubView:IMPOSTAZIONI];
+        self.homeButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.firmaElettronicaButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.cambioPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.sbloccoPINButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        
+        if(!([NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"]) || ([[NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"] isEqual:@""]) )
+        {
+            [_txtPorta setEnabled:TRUE];
+            [_txtProxyAddr setEnabled:TRUE];
+            [_txtPassword setEnabled:TRUE];
+            [_txtUsername setEnabled:TRUE];
+            [_cbMostraPsw setEnabled:TRUE];
+            _cbMostraPsw.state = NSOffState;
+            [_btnSalvaProxy setEnabled:TRUE];
+            [_btnModificaProxy setEnabled:FALSE];
+        }else
+        {
+            NSLog(@"User Defaults credentials: %@", [NSUserDefaults.standardUserDefaults objectForKey:@"credentials"]);
+            if(!([NSUserDefaults.standardUserDefaults objectForKey:@"credentials"]) || ([[NSUserDefaults.standardUserDefaults objectForKey:@"credentials"] isEqual:@""]))
+            {
+                
+                _txtUsername.stringValue=@"";
+                _txtPassword.stringValue=@"";
+            }else
+            {
+                NSString* encryptedCredentials = [NSUserDefaults.standardUserDefaults objectForKey:@"credentials"];
+                NSLog(@"Encrypted Credentials: %@", encryptedCredentials);
+                ProxyInfoManager *proxyInfoManager = [[ProxyInfoManager alloc] init];
+                NSString* decrypted = [proxyInfoManager getDecryptedCredentials:encryptedCredentials];
+                
+                if([[decrypted substringToIndex:5] isEqual:@"cred="])
+                {
+                    NSArray *infos = [[decrypted substringFromIndex:5] componentsSeparatedByString:@":"];
+                    _txtUsername.stringValue = infos[0];
+                    _txtPassword.stringValue = infos[1];
+                }
+            }
+            
+            _txtProxyAddr.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"];
+            _txtPorta.stringValue = [NSUserDefaults.standardUserDefaults objectForKey:@"proxyPort"];
+            
+            [_txtPorta setEnabled:FALSE];
+            [_txtProxyAddr setEnabled:FALSE];
+            [_txtPassword setEnabled:FALSE];
+            [_txtUsername setEnabled:FALSE];
+            [_cbMostraPsw setEnabled:FALSE];
+            _cbMostraPsw.state = NSOffState;
+            [_btnSalvaProxy setEnabled:FALSE];
+            [_btnModificaProxy setEnabled:TRUE];
+                
+        }
+
+        ChangeView *cG = [ChangeView getInstance];
+        [cG showSubView:IMPOSTAZIONI];
         
     });
 
@@ -1191,6 +1228,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         /*
         self.homeFirstPageView.hidden = YES;
@@ -1243,6 +1281,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
                         
         
         if((![NSUserDefaults.standardUserDefaults objectForKey:@"cieDictionary"]))
@@ -1336,6 +1375,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         /*
         self.homeFirstPageView.hidden = YES;
@@ -1368,6 +1408,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         
         self.homeFirstPageView.hidden = YES;
@@ -1401,6 +1442,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         [self updateAbbinaAndAnnullaLayout];
 
@@ -1435,6 +1477,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         self.progressIndicatorCambioPIN.hidden = YES;
         self.labelProgressCambioPIN.hidden = YES;
@@ -1469,6 +1512,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         /*
         self.homeFirstPageView.hidden = YES;
@@ -1497,6 +1541,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         self.progressIndicatorSbloccoPIN.hidden = YES;
         self.labelProgressSbloccoPIN.hidden = YES;
@@ -1532,6 +1577,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         /*
         self.homeFirstPageView.hidden = YES;
@@ -1564,6 +1610,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         
         self.labelHelp.stringValue = @"Aiuto";
@@ -1600,6 +1647,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         self.labelHelp.stringValue = @"Tutorial";
         self.assistenzaImageView.hidden = YES;
@@ -1634,6 +1682,7 @@ CK_RV completedCallback(string& PAN,
         self.tutorialButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.helpButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         self.infoButtonView.layer.backgroundColor = NSColor.grayColor.CGColor;
+        self.impostazioniButtonView.layer.backgroundColor = NSColor.clearColor.CGColor;
         
         /*
         self.homeFirstPageView.hidden = YES;
@@ -2355,8 +2404,33 @@ CK_RV completedCallback(string& PAN,
         //verifyInfo_t verifyInfos[512];
         verifyInfos_t vInfos;
         
-        //long ret = pfnVerificaConCie([inPath UTF8String]);
-        long ret = pfnVerificaConCie([inPath UTF8String], &vInfos);
+        NSString* proxyAddress = nil;
+        NSString* credentials = nil;
+        int proxyPort = 0;
+        
+        
+        if([NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"] && ![[NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"] isEqual:@""])
+        {
+            proxyPort = [[NSUserDefaults.standardUserDefaults objectForKey:@"proxyPort"] intValue];
+            proxyAddress = [NSUserDefaults.standardUserDefaults objectForKey:@"proxyUrl"];
+            
+            if([NSUserDefaults.standardUserDefaults objectForKey:@"credentials"] && ![[NSUserDefaults.standardUserDefaults objectForKey:@"credentials"] isEqual:@""])
+            {
+                NSString* encryptedCredentials = [NSUserDefaults.standardUserDefaults objectForKey:@"credentials"];
+                NSLog(@"Encrypted Credentials: %@", encryptedCredentials);
+                ProxyInfoManager *proxyInfoManager = [[ProxyInfoManager alloc] init];
+                NSString* decrypted = [proxyInfoManager getDecryptedCredentials:encryptedCredentials];
+                if([[decrypted substringToIndex:5] isEqual:@"cred="])
+                {
+                    credentials = [decrypted substringFromIndex:5];
+                }
+            }
+        }
+
+        
+        NSLog(@"Verifica con CIE - Url: %@, Port: %d, credentials: %@", proxyAddress, proxyPort, credentials);
+        
+        long ret = pfnVerificaConCie([inPath UTF8String], &vInfos, [proxyAddress UTF8String], proxyPort, [credentials UTF8String]);
         
         if(ret == 0)
         {
@@ -2483,6 +2557,83 @@ CK_RV completedCallback(string& PAN,
         
     });
     
+}
+- (IBAction)salvaProxyInfo:(id)sender {
+    
+    if(([_txtUsername.stringValue isEqual:@""] && ![_txtPassword.stringValue isEqual:@""]) || (![_txtUsername.stringValue isEqual:@""] && [_txtPassword.stringValue isEqual:@""]))
+    {
+        [self showMessage:@"Campo username o password mancante" withTitle:@"Credenziali proxy mancanti" exitAfter:false];
+        return;
+    }
+    
+    if(([_txtPorta.stringValue isEqual:@""] && ![_txtProxyAddr.stringValue isEqual:@""]) || (![_txtPorta.stringValue isEqual:@""] && [_txtProxyAddr.stringValue isEqual:@""]))
+    {
+        [self showMessage:@"Indirizzo o porta del proxy mancante" withTitle:@"Informazioni proxy mancanti" exitAfter:false];
+        return;
+    }
+    
+    [_txtPorta setEnabled:FALSE];
+    [_txtProxyAddr setEnabled:FALSE];
+    [_txtPassword setEnabled:FALSE];
+    [_txtUsername setEnabled:FALSE];
+    [_cbMostraPsw setEnabled:FALSE];
+    _cbMostraPsw.state = NSOffState;
+    [_btnSalvaProxy setEnabled:FALSE];
+    [_btnModificaProxy setEnabled:TRUE];
+    
+    
+    if([_txtUsername.stringValue isEqual:@""] )
+    {
+        [NSUserDefaults.standardUserDefaults setObject:@"" forKey:@"credentials"];
+    }else
+    {
+        NSString* credentials = [NSString stringWithFormat:@"cred=%@:%@", _txtUsername.stringValue, _txtPassword.stringValue];
+        NSLog(@"Credentials: %@", credentials);
+        ProxyInfoManager *proxyInfoManager = [[ProxyInfoManager alloc] init];
+        NSString* encryptedCredentials = [proxyInfoManager getEncryptedCredentials:credentials];
+        [NSUserDefaults.standardUserDefaults setObject:encryptedCredentials forKey:@"credentials"];
+        NSLog(@"Credenziali salvate!!!");
+        
+    }
+    
+    [NSUserDefaults.standardUserDefaults setObject:_txtProxyAddr.stringValue forKey:@"proxyUrl"];
+    
+    if([_txtPorta.stringValue isEqual:@""])
+    {
+        [NSUserDefaults.standardUserDefaults setObject:@"" forKey:@"proxyPort"];
+    }else
+    {
+        [NSUserDefaults.standardUserDefaults setObject:_txtPorta.stringValue forKey:@"proxyPort"];
+    }
+    
+    [NSUserDefaults.standardUserDefaults synchronize];
+    
+}
+
+- (IBAction)modificaProxyInfo:(id)sender {
+    
+    [_txtPorta setEnabled:TRUE];
+    [_txtProxyAddr setEnabled:TRUE];
+    [_txtPassword setEnabled:TRUE];
+    [_txtUsername setEnabled:TRUE];
+    [_cbMostraPsw setEnabled:TRUE];
+    _cbMostraPsw.state = NSOffState;
+    [_btnSalvaProxy setEnabled:TRUE];
+    [_btnModificaProxy setEnabled:FALSE];
+}
+
+- (IBAction)mostraPassword:(id)sender {
+    
+    if(_cbMostraPsw.state == NSControlStateValueOn && ![_txtPassword.stringValue isEqual:@""])
+    {
+        _plainPassword.stringValue = _txtPassword.stringValue;
+        [_txtPassword setHidden:TRUE];
+        [_plainPassword setHidden:FALSE];
+    }else
+    {
+        [_txtPassword setHidden:FALSE];
+        [_plainPassword setHidden:TRUE];
+    }
 }
 
 #pragma mark - CarouselViewDelegate

@@ -26,7 +26,7 @@
 + (NSMutableData *)doAES:(NSData *)dataIn context:(CCOperation)kCCEncrypt_or_kCCDecrypt key: (NSData*) key iv:(NSData*)iv error:(NSError **)error {
         CCCryptorStatus ccStatus   = kCCSuccess;
         size_t          cryptBytes = 0;
-        NSMutableData  *dataOut    = [NSMutableData dataWithLength:dataIn.length + kCCBlockSizeBlowfish];
+        NSMutableData  *dataOut    = [NSMutableData dataWithLength:dataIn.length + kCCBlockSizeAES128];
 
         ccStatus = CCCrypt( kCCEncrypt_or_kCCDecrypt,
                            kCCAlgorithmAES,
@@ -49,6 +49,7 @@
                                              code:ccStatus
                                          userInfo:nil];
             }
+            
             dataOut = nil;
         }
 

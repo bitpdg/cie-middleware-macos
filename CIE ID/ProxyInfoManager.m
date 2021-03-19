@@ -27,7 +27,6 @@
     return self;
 }
 
-
 -(NSString *)getEncryptedCredentials: (NSString*)credentials
 {
     NSError *error;
