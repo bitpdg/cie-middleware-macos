@@ -577,7 +577,7 @@ CK_RV completedCallback(string& PAN,
 - (IBAction)home:(id)sender
 {
     _lblFirmaHome.stringValue = @"CIE ID";
-    _lblSubFirmaHome.stringValue = @"Carta di Identità Elettrinica abbinata correttamente";
+    _lblSubFirmaHome.stringValue = @"Carta di Identità Elettronica abbinata correttamente";
     [self showHomeFirstPage];
 }
 
@@ -2580,16 +2580,6 @@ CK_RV completedCallback(string& PAN,
         return;
     }
     
-    [_txtPorta setEnabled:FALSE];
-    [_txtProxyAddr setEnabled:FALSE];
-    [_txtPassword setEnabled:FALSE];
-    [_txtUsername setEnabled:FALSE];
-    [_cbMostraPsw setEnabled:FALSE];
-    _cbMostraPsw.state = NSOffState;
-    [_btnSalvaProxy setEnabled:FALSE];
-    [_btnModificaProxy setEnabled:TRUE];
-    
-    
     if([_txtUsername.stringValue isEqual:@""] )
     {
         [NSUserDefaults.standardUserDefaults setObject:@"" forKey:@"credentials"];
@@ -2615,6 +2605,29 @@ CK_RV completedCallback(string& PAN,
     }
     
     [NSUserDefaults.standardUserDefaults synchronize];
+    
+    if([_txtProxyAddr.stringValue isEqual:@""])
+    {
+        [_txtPorta setEnabled:TRUE];
+        [_txtProxyAddr setEnabled:TRUE];
+        [_txtPassword setEnabled:TRUE];
+        [_txtUsername setEnabled:TRUE];
+        [_cbMostraPsw setEnabled:TRUE];
+        _cbMostraPsw.state = NSOffState;
+        [_btnSalvaProxy setEnabled:TRUE];
+        [_btnModificaProxy setEnabled:FALSE];
+    }else
+    {
+        [_txtPorta setEnabled:FALSE];
+        [_txtProxyAddr setEnabled:FALSE];
+        [_txtPassword setEnabled:FALSE];
+        [_txtUsername setEnabled:FALSE];
+        [_cbMostraPsw setEnabled:FALSE];
+        _cbMostraPsw.state = NSOffState;
+        [_btnSalvaProxy setEnabled:FALSE];
+        [_btnModificaProxy setEnabled:TRUE];
+    }
+
     
 }
 
@@ -2642,45 +2655,6 @@ CK_RV completedCallback(string& PAN,
         [_txtPassword setHidden:FALSE];
         [_plainPassword setHidden:TRUE];
     }
-}
-
-#pragma mark - CarouselViewDelegate
-
-- (void)shouldAddCard {
-    /*
-    self.homeFirstPageView.hidden = NO;
-    self.homeSecondPageView.hidden = YES;
-    self.homeThirdPageView.hidden = YES;
-    self.homeFourthPageView.hidden = YES;
-    self.cambioPINPageView.hidden = YES;
-    self.cambioPINOKPageView.hidden = YES;
-    self.sbloccoPageView.hidden = YES;
-    self.sbloccoOKPageView.hidden = YES;
-    self.helpPageView.hidden = YES;
-    self.infoPageView.hidden = YES;
-     */
-    ChangeView *cG = [ChangeView getInstance];
-    [cG showSubView:HOME_FIRST_PAGE];
-     
-    
-    for(int i = 1; i < 9; i++)
-    {
-        NSTextField* txtField = [self.view viewWithTag:i];
-        
-        txtField.stringValue = @"";
-    }
-    
-    NSTextField* txtField = [self.view viewWithTag:1];
-    [txtField selectText:nil];
-}
-
-- (void)shouldRemoveAllCards {
-    [self askRemoveAll:@"Vuoi rimuovere tutte le CIE attualmente abbinate?" withTitle:@"Rimozione CIE"];
-}
-
-- (void)shouldRemoveCard:(nonnull Cie *)card {
-    removingCie = card;
-    [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -2734,6 +2708,45 @@ CK_RV completedCallback(string& PAN,
     
     ChangeView *cG = [ChangeView getInstance];
     [cG showSubView:SELECT_FILE_PAGE];
+}
+
+#pragma mark - CarouselViewDelegate
+
+- (void)shouldAddCard {
+    /*
+    self.homeFirstPageView.hidden = NO;
+    self.homeSecondPageView.hidden = YES;
+    self.homeThirdPageView.hidden = YES;
+    self.homeFourthPageView.hidden = YES;
+    self.cambioPINPageView.hidden = YES;
+    self.cambioPINOKPageView.hidden = YES;
+    self.sbloccoPageView.hidden = YES;
+    self.sbloccoOKPageView.hidden = YES;
+    self.helpPageView.hidden = YES;
+    self.infoPageView.hidden = YES;
+     */
+    ChangeView *cG = [ChangeView getInstance];
+    [cG showSubView:HOME_FIRST_PAGE];
+     
+    
+    for(int i = 1; i < 9; i++)
+    {
+        NSTextField* txtField = [self.view viewWithTag:i];
+        
+        txtField.stringValue = @"";
+    }
+    
+    NSTextField* txtField = [self.view viewWithTag:1];
+    [txtField selectText:nil];
+}
+
+- (void)shouldRemoveAllCards {
+    [self askRemoveAll:@"Vuoi rimuovere tutte le CIE attualmente abbinate?" withTitle:@"Rimozione CIE"];
+}
+
+- (void)shouldRemoveCard:(nonnull Cie *)card {
+    removingCie = card;
+    [self askRemove:[NSString stringWithFormat:@"Stai rimuovendo la Carta di Identità di %@ dal sistema, per utilizzarla nuovamente dovrai ripetere l'abbinamento.", [card getName]] withTitle:@"Rimozione CIE"];
 }
 
 @end
