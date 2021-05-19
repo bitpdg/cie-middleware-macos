@@ -313,6 +313,8 @@
 		77A9C3CD26049A6B00317B90 /* AES.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AES.h; sourceTree = "<group>"; };
 		77A9C3D62604AE4000317B90 /* ProxyInfoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProxyInfoManager.m; sourceTree = "<group>"; };
 		77A9C3E02604AE5000317B90 /* ProxyInfoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProxyInfoManager.h; sourceTree = "<group>"; };
+		77AFDA6626380557002E418E /* libcrypto2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto2.a; path = cie_sign_sdk/Dependencies/libcrypto2.a; sourceTree = "<group>"; };
+		77AFDA93263807D8002E418E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = cie_sign_sdk/Dependencies/openssl/libssl.a; sourceTree = "<group>"; };
 		77BAE798261EFAB500592607 /* libbz2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbz2.a; path = cie_sign_sdk/Dependencies/bzip2/libbz2.a; sourceTree = "<group>"; };
 		77BAE79A261EFAD400592607 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = cie_sign_sdk/Dependencies/libcurl/libcurl.a; sourceTree = "<group>"; };
 		77BAE79C261EFAEA00592607 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = cie_sign_sdk/Dependencies/expat/libexpat.a; sourceTree = "<group>"; };
@@ -986,6 +988,8 @@
 		E5BE7DC620FE8A9A00004389 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				77AFDA93263807D8002E418E /* libssl.a */,
+				77AFDA6626380557002E418E /* libcrypto2.a */,
 				77BAE7AA261EFB6000592607 /* libz.a */,
 				77BAE7A8261EFB5600592607 /* libxml2.a */,
 				77BAE7A6261EFB4B00592607 /* libpodofo.a */,
@@ -2031,6 +2035,7 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/cie-pkcs11",
@@ -2046,7 +2051,10 @@
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/podofo",
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/libxml2",
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/zlib",
+					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies",
+					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/openssl",
 				);
+				NEW_SETTING = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -2072,6 +2080,7 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/cie-pkcs11",
@@ -2087,8 +2096,11 @@
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/podofo",
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/libxml2",
 					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/zlib",
+					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies",
+					"$(PROJECT_DIR)/cie_sign_sdk/Dependencies/openssl",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				NEW_SETTING = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"-ObjC",
